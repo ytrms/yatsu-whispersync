@@ -12,11 +12,11 @@ const outName = 'yatsu-whispersync.tm.user.js';
 const header = `// ==UserScript==
 // @name        Yatsu Whispersync
 // @namespace   https://github.com/Renji-XD
-// @version     1.0.14
+// @version     1.0.15
 // @description Listen to audiobooks with Yatsu Reader
 // @icon https://docs.yatsu.moe/assets/ya.svg
 // @grant       GM_getResourceURL
-// @author      Original author: Renji-xD, with modifications by ryzusaku, trms, and ytrms
+// @author      Original author: Renji-xD, with modifications by ryzusaku and ytrms
 // @homepageURL https://github.com/ytrms/yatsu-whispersync
 // @resource mediaInfo https://cdn.jsdelivr.net/npm/mediainfo.js@0.2.1/dist/MediaInfoModule.wasm
 // @resource ffmpeg-core.js https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.6/dist/esm/ffmpeg-core.js
