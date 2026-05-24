@@ -68,6 +68,7 @@
 		toTimeStamp,
 		between,
 	} from '../lib/util';
+	import { portalToBody } from '../lib/portal';
 	import Match from './Match.svelte';
 	import {
 		mdiArrowSplitVertical,
@@ -921,6 +922,7 @@
 	class:flex={showMenu}
 	style:width={sideMenuWidth || null}
 	bind:this={menuElement}
+	use:portalToBody
 	on:wheel|passive|stopPropagation
 >
 	<div class="flex justify-between right-menu p-4 break-all" class:left-menu={isLeftMenu}>

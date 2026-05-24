@@ -4,6 +4,7 @@
 	import Icon from './Icon.svelte';
 	import { Action } from '../lib/actions';
 	import type { Context, Subtitle } from '../lib/general';
+	import { portalToBody } from '../lib/portal';
 	import { currentAudioLoaded$, currentSubtitles$, isRecording$, settings$ } from '../lib/stores';
 	import { mdiClose } from '@mdi/js';
 	import { createEventDispatcher, getContext, onDestroy, tick } from 'svelte';
@@ -146,6 +147,7 @@
 	class:flex-col={isVertical}
 	class:hidden={!range}
 	bind:this={popoverElement}
+	use:portalToBody
 >
 	<button title="Close menu" class:p-y-xs={isVertical} class:p-x-xs={!isVertical} on:click={onClose}>
 		<Icon path={mdiClose} />

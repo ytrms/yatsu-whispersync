@@ -1,8 +1,10 @@
 <script lang="ts">
 	import ActionButtonList from './ActionButtonList.svelte';
+	import Icon from './Icon.svelte';
+	import Popover from './Popover.svelte';
 	import { Action, executeAction } from '../lib/actions';
 	import type { MouseEventWithElement, PointerEventWithElement, Subtitle } from '../lib/general';
-	import { SubtitleActionsVisibility } from '../lib/settings';
+	import { SubtitleActionsVisibility, type ActionListItem } from '../lib/settings';
 	import {
 		activeSubtitle$,
 		currentSubtitles$,
@@ -15,6 +17,7 @@
 	import { onMount, tick } from 'svelte';
 	import type { Readable } from 'svelte/store';
 	import { createVirtualizer, type SvelteVirtualizer } from '@tanstack/svelte-virtual';
+	import { mdiDotsHorizontal } from '@mdi/js';
 
 	export let subtitles: Subtitle[];
 	export let skipUpdates = false;
@@ -117,6 +120,29 @@
 	const lineHeight = $subtitlesCopyLineHeight$
 		? Number.parseFloat(window.localStorage.getItem('lineHeight') || '1.65')
 		: $subtitlesLineHeight$;
+	const primarySubtitleActionOrder = [
+		Action.RESTART_PLAYBACK,
+		Action.TOGGLE_BOOKMARK,
+		Action.TOGGLE_MERGE,
+	];
+	const overflowSubtitleActionGroups = [
+		{
+			label: 'Playback',
+			actions: [Action.TOGGLE_PLAY_PAUSE, Action.TOGGLE_PLAYBACK_LOOP],
+		},
+		{
+			label: 'Text',
+			actions: [Action.RESTORE_SUBTITLE, Action.EDIT_SUBTITLE],
+		},
+		{
+			label: 'Export',
+			actions: [Action.EXPORT_NEW, Action.EXPORT_UPDATE],
+		},
+		{
+			label: 'Filters',
+			actions: [Action.TOGGLE_SHOW_BOOKMARKED, Action.TOGGLE_SHOW_FOR_MERGE],
+		},
+	];
 
 	let virtualizer: Readable<SvelteVirtualizer<HTMLDivElement, HTMLDivElement>>;
 	let virtualListElement: HTMLDivElement;
@@ -126,6 +152,8 @@
 	let containerHeight = 0;
 
 	$: displayedSubtitles = virtualizer ? $virtualizer.getVirtualItems() : [];
+	$: primarySubtitleActionItems = getActionItems($actionListOfSubtitles$, primarySubtitleActionOrder);
+	$: subtitleOverflowActionGroups = getOverflowActionGroups($actionListOfSubtitles$);
 
 	$: onResetList($lastError$);
 
@@ -232,6 +260,28 @@
 			$virtualizer.measureElement(virtualItemElements[index]);
 		}
 	}
+
+	function getActionItems(actionList: ActionListItem[], actions: Action[]) {
+		return actions
+			.map((action) => actionList.find((item) => item.action === action))
+			.filter((item): item is ActionListItem => !!item?.enabled);
+	}
+
+	function getOverflowActionGroups(actionList: ActionListItem[]) {
+		const groupedActions = new Set([
+			...primarySubtitleActionOrder,
+			...overflowSubtitleActionGroups.flatMap(({ actions }) => actions),
+		]);
+		const actionGroups = overflowSubtitleActionGroups
+			.map(({ label, actions }) => ({
+				label,
+				items: getActionItems(actionList, actions),
+			}))
+			.filter(({ items }) => items.length);
+		const remainingItems = actionList.filter((item) => item.enabled && !groupedActions.has(item.action));
+
+		return remainingItems.length ? [...actionGroups, { label: 'More', items: remainingItems }] : actionGroups;
+	}
 </script>
 
 <div
@@ -269,20 +319,48 @@
 						>
 							{subtitles[displayedSubtitle.index].text}
 						</div>
-						<div
-							class="flex invisible m-x-xs m-y-b sub-action"
-							class:show={$subtitlesActionsVisibility$ === SubtitleActionsVisibility.ALWAYS}
-							class:hidden={$subtitlesActionsVisibility$ === SubtitleActionsVisibility.HIDDEN}
-						>
-							<div class="grid">
-								<ActionButtonList
-									hideCancelAction
-									listItems={$actionListOfSubtitles$}
-									subtitle={subtitles[displayedSubtitle.index]}
-									{skipUpdates}
-								/>
+						{#if primarySubtitleActionItems.length || subtitleOverflowActionGroups.length}
+							<div
+								class="invisible sub-action"
+								class:show={$subtitlesActionsVisibility$ === SubtitleActionsVisibility.ALWAYS}
+								class:hidden={$subtitlesActionsVisibility$ === SubtitleActionsVisibility.HIDDEN}
+							>
+								{#if primarySubtitleActionItems.length}
+									<div class="subtitle-action-primary">
+										<ActionButtonList
+											hideCancelAction
+											listItems={primarySubtitleActionItems}
+											subtitle={subtitles[displayedSubtitle.index]}
+											{skipUpdates}
+										/>
+									</div>
+								{/if}
+								{#if subtitleOverflowActionGroups.length}
+									<div class="subtitle-action-overflow">
+										<Popover placement="left" fallbackPlacements={['right', 'top', 'bottom']}>
+											<div slot="icon" title="More subtitle actions" class="subtitle-action-more-trigger">
+												<Icon path={mdiDotsHorizontal} />
+											</div>
+											<div class="subtitle-action-menu">
+												{#each subtitleOverflowActionGroups as actionGroup}
+													<div class="subtitle-action-menu-group">
+														<div class="subtitle-action-menu-label">{actionGroup.label}</div>
+														<div class="subtitle-action-menu-buttons">
+															<ActionButtonList
+																hideCancelAction
+																listItems={actionGroup.items}
+																subtitle={subtitles[displayedSubtitle.index]}
+																{skipUpdates}
+															/>
+														</div>
+													</div>
+												{/each}
+											</div>
+										</Popover>
+									</div>
+								{/if}
 							</div>
-						</div>
+						{/if}
 					</div>
 				{/each}
 			</div>

@@ -864,12 +864,17 @@
 	}
 </script>
 
-<div class="flex m-y-s">
-	<button title={changeAudioTitle} disabled={!!$exportCancelController$} on:click={onSetAudioFile}>
+<div class="audiobook-summary m-y-s">
+	<button
+		class="audiobook-cover-action"
+		title={changeAudioTitle}
+		disabled={!!$exportCancelController$}
+		on:click={onSetAudioFile}
+	>
 		{#if $currentCoverUrl$}
 			<img id="ttu-whispersync-cover" class="cover" src={$currentCoverUrl$} alt="cover" on:load={imageLoaded} />
 		{:else}
-			<div class="cover">
+			<div class="cover cover-placeholder">
 				<svg
 					width="100%"
 					height="100%"
@@ -892,8 +897,9 @@
 			</div>
 		{/if}
 	</button>
-	<div class="flex flex-1 flex-col">
-		<div class="flex justify-between w-full header-icons">
+	<div class="audiobook-summary-main">
+		<div class="audiobook-action-clusters">
+			<div class="audiobook-action-group" aria-label="Book and file actions">
 			<button title="Export book to text file" on:click={onExportToText}>
 				<Icon path={mdiTextBox} />
 			</button>
@@ -980,8 +986,8 @@
 			>
 				<Icon path={mdiTrashCan} />
 			</button>
-		</div>
-		<div class="flex justify-between w-full m-t-s header-icons">
+			</div>
+			<div class="audiobook-action-group" aria-label="Subtitle review actions">
 			<button
 				title={resetPlaybackPositionTitle}
 				disabled={resetPlaybackPositionTitle !== 'Reset playback position'}
@@ -1043,8 +1049,8 @@
 			>
 				<Icon path={mdiRefresh} />
 			</button>
-		</div>
-		<div class="flex justify-between w-full m-t-s header-icons">
+			</div>
+			<div class="audiobook-action-group" aria-label="Anki and footer actions">
 			<button title={toggleHideFooterActionsTitle} on:click={() => ($hideFooterActions$ = !$hideFooterActions$)}>
 				<Icon path={$hideFooterActions$ ? mdiEyeOutline : mdiEyeOffOutline} />
 			</button>
@@ -1091,24 +1097,16 @@
 				path={mdiOpenInApp}
 				buttonClasses=""
 			/>
-			<button class="invisible">
-				<Icon path={mdiFloppy} />
-			</button>
-			<button class="invisible">
-				<Icon path={mdiFloppy} />
-			</button>
-			<button class="invisible">
-				<Icon path={mdiFloppy} />
-			</button>
+			</div>
 		</div>
 		<div
-			class="flex flex-1"
+			class="audiobook-playback-summary"
 			class:hidden={!$currentAudioLoaded$ && !$currentSubtitles$.size}
-			style="align-items: flex-end;"
 		>
 			<Popover placement="bottom" bind:this={currentTimePopover}>
 				<div slot="icon">
 					<button
+						class="audiobook-time-button"
 						title={$isRecording$ ? 'Recording in progress' : 'Change playback position'}
 						disabled={$isRecording$}
 						on:click={() => {
@@ -1142,7 +1140,7 @@
 			</Popover>
 			{#if $currentSubtitles$.size}
 				<button
-					class="m-l-s"
+					class="audiobook-time-jump"
 					title={$isRecording$ ? 'Recording in progress' : 'Scroll to current playback position'}
 					disabled={$isRecording$}
 				>

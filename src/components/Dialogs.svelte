@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { Dialog } from '../lib/general';
+	import { portalToBody } from '../lib/portal';
 	import { dialogs$, skipKeyListener$ } from '../lib/stores';
 
 	let dialog: Dialog | undefined;
@@ -29,6 +30,7 @@
 	<div
 		class="ttu-whispersync-dialog writing-horizontal-tb fixed inset-0 w-full h-full"
 		style:z-index={zIndex}
+		use:portalToBody
 		on:wheel|passive|stopPropagation
 	>
 		<div tabindex="0" role="button" class="absolute inset-0 tap-highlight-transparent bg-black/[.32]" />

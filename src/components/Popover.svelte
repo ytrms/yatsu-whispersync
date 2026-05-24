@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { autoUpdate, computePosition, flip, offset, shift, type Placement } from '@floating-ui/dom';
 	import { clickOutside } from '../lib/actions';
+	import { portalToBody } from '../lib/portal';
 	import { tick } from 'svelte';
 
 	export let placement: Placement = 'left';
@@ -51,6 +52,7 @@
 		<div
 			class="ttu-whispersync-container popover"
 			bind:this={popoverElement}
+			use:portalToBody
 			use:clickOutside={({ target }) => {
 				if (!(target instanceof Element)) {
 					return;
