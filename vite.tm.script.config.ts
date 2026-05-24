@@ -11,8 +11,8 @@ const outDir = 'tamper_monkey';
 const outName = 'yatsu-whispersync.tm.user.js';
 const header = `// ==UserScript==
 // @name        Yatsu Whispersync
-// @namespace   https://github.com/ytrms
-// @version     1.0.13
+// @namespace   https://github.com/Renji-XD
+// @version     1.0.14
 // @description Listen to audiobooks with Yatsu Reader
 // @icon https://docs.yatsu.moe/assets/ya.svg
 // @grant       GM_getResourceURL
