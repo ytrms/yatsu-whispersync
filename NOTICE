@@ -1,0 +1,10 @@
+Yatsu Whispersync
+
+This project is adapted from ttu-whispersync:
+https://github.com/Renji-XD/ttu-whispersync
+
+Original author: Renji-xD
+Original license: MIT, preserved in LICENSE and generated userscript headers.
+
+Yatsu-compatible modifications include reader target metadata, Yatsu reader
+bootstrap support, Yatsu documentation links, and Yatsu-aligned UI styling.
