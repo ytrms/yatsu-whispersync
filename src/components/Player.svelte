@@ -32,6 +32,7 @@
 		playbackRate$,
 		playLine$,
 		readerActionSubtitle$,
+		readerCueDispatchTime$,
 		settings$,
 		skipKeyListener$,
 		subtitleChange$,
@@ -96,6 +97,8 @@
 		}
 
 		await new Promise((resolve) => setTimeout(resolve));
+
+		$readerCueDispatchTime$ = Date.now();
 
 		document.dispatchEvent(
 			new CustomEvent('ttu-action', {
@@ -741,6 +744,8 @@
 		updateCSSClasses(id);
 
 		if (originalCurrentTime === -1 && $readerEnableAutoScroll$ && !skipNextCue) {
+			$readerCueDispatchTime$ = Date.now();
+
 			document.dispatchEvent(
 				new CustomEvent('ttu-action', {
 					detail: {

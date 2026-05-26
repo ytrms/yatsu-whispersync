@@ -91,6 +91,7 @@ export type Settings = {
 	'ttu-whispersync-reader-enable-auto-reload': boolean;
 	'ttu-whispersync-reader-enable-filesystem-api': boolean;
 	'ttu-whispersync-reader-enable-auto-scroll': boolean;
+	'ttu-whispersync-reader-enable-visual-novel-auto-play': boolean;
 	'ttu-whispersync-reader-enable-tracker-auto-pause': boolean;
 	'ttu-whispersync-reader-prevent-action-on-selection': boolean;
 	'ttu-whispersync-reader-enable-menu-target': boolean;
@@ -253,6 +254,7 @@ export function getDefaultSettings(): Settings {
 		'ttu-whispersync-reader-enable-auto-reload': true,
 		'ttu-whispersync-reader-enable-filesystem-api': true,
 		'ttu-whispersync-reader-enable-auto-scroll': true,
+		'ttu-whispersync-reader-enable-visual-novel-auto-play': false,
 		'ttu-whispersync-reader-enable-tracker-auto-pause': true,
 		'ttu-whispersync-reader-prevent-action-on-selection': true,
 		'ttu-whispersync-reader-enable-menu-target': true,
