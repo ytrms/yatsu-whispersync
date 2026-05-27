@@ -98,7 +98,6 @@
 		readerEnableLineHighlight$,
 		readerEnableLineTextHighlight$,
 		readerEnableAutoScroll$,
-		readerEnableVisualNovelAutoPlay$,
 		readerScrollMode$,
 		readerClickAction$,
 		readerMenuOpenMode$,
@@ -554,11 +553,6 @@
 			label="Enable auto scroll"
 			helpText="If enabled the reader will automatically scroll to active subtitles - requires matched book/line and subtitle/audio file"
 			targetStore$={readerEnableAutoScroll$}
-		/>
-		<SettingsCheckbox
-			label="Enable VN auto play"
-			helpText="If enabled Visual Novel mode will start playback from the first matched subtitle whenever you advance forward to a new VN page - requires matched book/line and subtitle/audio file"
-			targetStore$={readerEnableVisualNovelAutoPlay$}
 		/>
 		{#if $readerEnableAutoScroll$}
 			<SettingsCheckbox

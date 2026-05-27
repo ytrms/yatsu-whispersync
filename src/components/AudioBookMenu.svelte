@@ -48,7 +48,6 @@
 		openLastExportedCardTitle$,
 		paused$,
 		previousSubtitleTitle$,
-		readerCueDispatchTime$,
 		readerActionSubtitle$,
 		restartPlaybackTitle$,
 		restoreSubtitleTitle$,
@@ -92,9 +91,7 @@
 	const sideMenuWidthKey = 'ttu-whispersync-side-menu-width';
 	const supportsFileSystem = 'showOpenFilePicker' in window;
 	const isVertical = (window.localStorage.getItem('writingMode') || 'vertical-rl') === 'vertical-rl';
-	const viewMode = window.localStorage.getItem('viewMode') || 'paginated';
-	const isPaginated = viewMode === 'paginated';
-	const isVisualNovel = viewMode === 'visual-novel';
+	const isPaginated = (window.localStorage.getItem('viewMode') || 'paginated') === 'paginated';
 	const firstDimensionMargin = `-${window.localStorage.getItem('firstDimensionMargin') || 0}px`;
 	const readerIntersectionObserver: IntersectionObserver | undefined = isPaginated
 		? undefined
@@ -113,7 +110,6 @@
 		readerEnableFilesystemApi$,
 		readerPreventActionOnSelection$,
 		readerEnableMenuTarget$,
-		readerEnableVisualNovelAutoPlay$,
 		readerClickAction$,
 		readerMenuOpenMode$,
 		readerMenuPauseMode$,
@@ -150,9 +146,6 @@
 	let originalPos = 0;
 	let posDiff = 0;
 	let resizeTimer: number | undefined;
-	let visualNovelAutoPlayTimer: number | undefined;
-	let visualNovelExploredCharCount: number | undefined;
-	let visualNovelBlockIndex: number | undefined;
 
 	$isMobile$ = navigator.maxTouchPoints > 0;
 
@@ -300,7 +293,6 @@
 
 		document.removeEventListener('ttsu:skipKeyListener', onSkipKeyListener, false);
 		document.removeEventListener('ttsu:page.change', onPageChange, false);
-		window.clearTimeout(visualNovelAutoPlayTimer);
 
 		readerIntersectionObserver?.disconnect();
 
@@ -517,11 +509,7 @@
 			return;
 		}
 
-		if (isVisualNovel) {
-			visualNovelBlockIndex = getCurrentVisualNovelBlockIndex();
-		}
-
-		if (isPaginated || isVisualNovel) {
+		if (isPaginated) {
 			document.addEventListener('ttsu:page.change', onPageChange, false);
 		}
 
@@ -532,111 +520,8 @@
 		$skipKeyListener$ = detail;
 	}
 
-	function onPageChange(event: Event) {
+	function onPageChange() {
 		resetReaderMenu();
-		handleVisualNovelPageChange((event as CustomEvent).detail);
-	}
-
-	function handleVisualNovelPageChange(detail: { exploredCharCount?: unknown } | undefined) {
-		if (!isVisualNovel) {
-			return;
-		}
-
-		const exploredCharCount =
-			typeof detail?.exploredCharCount === 'number'
-				? detail.exploredCharCount
-				: Number.parseFloat(`${detail?.exploredCharCount ?? ''}`);
-
-		if (!Number.isFinite(exploredCharCount)) {
-			return;
-		}
-
-		const previousExploredCharCount = visualNovelExploredCharCount;
-		const previousBlockIndex = visualNovelBlockIndex;
-
-		visualNovelExploredCharCount = exploredCharCount;
-
-		if (!$readerEnableVisualNovelAutoPlay$) {
-			return;
-		}
-
-		scheduleVisualNovelPageAutoPlay({
-			exploredCharCount,
-			previousBlockIndex,
-			previousExploredCharCount,
-		});
-	}
-
-	function scheduleVisualNovelPageAutoPlay({
-		exploredCharCount,
-		previousBlockIndex,
-		previousExploredCharCount,
-	}: {
-		exploredCharCount: number;
-		previousBlockIndex: number | undefined;
-		previousExploredCharCount: number | undefined;
-	}) {
-		window.clearTimeout(visualNovelAutoPlayTimer);
-
-		visualNovelAutoPlayTimer = window.setTimeout(() => {
-			visualNovelAutoPlayTimer = undefined;
-
-			const currentBlockIndex = getCurrentVisualNovelBlockIndex();
-			const movedForward =
-				previousBlockIndex !== undefined && currentBlockIndex !== undefined
-					? currentBlockIndex > previousBlockIndex
-					: previousExploredCharCount !== undefined &&
-						exploredCharCount > previousExploredCharCount;
-			const triggeredByReaderCue =
-				$readerCueDispatchTime$ > 0 && Date.now() - $readerCueDispatchTime$ < 1000;
-
-			visualNovelBlockIndex = currentBlockIndex ?? visualNovelBlockIndex;
-
-			if (movedForward && !triggeredByReaderCue) {
-				void playCurrentVisualNovelPageAudio();
-			}
-		});
-	}
-
-	async function playCurrentVisualNovelPageAudio() {
-		if (
-			!$readerEnableVisualNovelAutoPlay$ ||
-			!$currentAudioLoaded$ ||
-			!$currentSubtitles$.size ||
-			$isRecording$
-		) {
-			return;
-		}
-
-		const subtitle = getCurrentVisualNovelPageSubtitle();
-
-		if (!subtitle) {
-			return;
-		}
-
-		await executeAction(Action.RESTART_PLAYBACK, subtitle, { ignoreSkipKeyListener: true });
-	}
-
-	function getCurrentVisualNovelBlockIndex(): number | undefined {
-		const match = bookContentElement.getAttribute('aria-label')?.match(/VN block\s+(\d+)\s*\/\s*\d+/);
-		const blockNumber = match ? Number.parseInt(match[1], 10) : Number.NaN;
-
-		return Number.isFinite(blockNumber) ? blockNumber - 1 : undefined;
-	}
-
-	function getCurrentVisualNovelPageSubtitle(): Subtitle | undefined {
-		const elements = bookContentElement.querySelectorAll<HTMLElement>(getLineCSSSelector());
-
-		for (let index = 0, { length } = elements; index < length; index += 1) {
-			const subtitleId = getSubtitleIdFromElement(elements[index]);
-			const subtitle = $currentSubtitles$.get(subtitleId);
-
-			if (subtitle) {
-				return subtitle;
-			}
-		}
-
-		return undefined;
 	}
 
 	async function initializeComponentData(forceLoad = false) {

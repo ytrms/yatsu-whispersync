@@ -136,8 +136,6 @@ export const activeSubtitle$ = revertWriteable<ActiveSubtitle>({ previous: '', c
 
 export const readerActionSubtitle$ = revertWriteable<Subtitle | undefined>();
 
-export const readerCueDispatchTime$ = revertWriteable<number>(0);
-
 export const paused$ = revertWriteable<boolean>(true);
 
 export const currentTime$ = revertWriteable<number>(0);
@@ -160,7 +158,6 @@ export const settings$ = {
 	readerEnableAutoReload$: writableBooleanStore()('ttu-whispersync-reader-enable-auto-reload'),
 	readerEnableFilesystemApi$: writableBooleanStore()('ttu-whispersync-reader-enable-filesystem-api'),
 	readerEnableAutoScroll$: writableBooleanStore()('ttu-whispersync-reader-enable-auto-scroll'),
-	readerEnableVisualNovelAutoPlay$: writableBooleanStore()('ttu-whispersync-reader-enable-visual-novel-auto-play'),
 	readerEnableTrackerAutoPause$: writableBooleanStore()('ttu-whispersync-reader-enable-tracker-auto-pause'),
 	readerPreventActionOnSelection$: writableBooleanStore()('ttu-whispersync-reader-prevent-action-on-selection'),
 	readerEnableMenuTarget$: writableBooleanStore()('ttu-whispersync-reader-enable-menu-target'),
