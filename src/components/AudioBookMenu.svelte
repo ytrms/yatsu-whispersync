@@ -135,6 +135,7 @@
 	let readerInteractionTimer: number | undefined;
 	let readerMenuBookElement: Element | undefined;
 	let readerMenuRangeElement: Range | undefined;
+	let readerMenuAnchorRect: DOMRect | undefined;
 	let readerMenuElement: ReaderMenu | undefined;
 	let showMenu = false;
 	let loadError = '';
@@ -753,16 +754,50 @@
 	}
 
 	function setClosestSubtitleElement(event: MouseEvent | PointerEvent) {
-		const elementFromPoint = document.elementFromPoint(event.x, event.y);
+		const elementFromPoint = document.elementFromPoint(event.clientX, event.clientY);
 		const closestSubtitleElement = elementFromPoint?.closest(getLineCSSSelector());
 
 		if (closestSubtitleElement instanceof HTMLSpanElement) {
 			readerMenuBookElement = closestSubtitleElement;
+			readerMenuAnchorRect = getReaderMenuAnchorRect(closestSubtitleElement, event.clientX, event.clientY);
 		} else if (!readerMenuElement?.isInReaderMenu(elementFromPoint)) {
 			resetReaderMenu();
 		}
 
 		return readerMenuBookElement;
+	}
+
+	function getReaderMenuAnchorRect(element: HTMLElement, x: number, y: number) {
+		const clientRects = [...element.getClientRects()].filter((rect) => rect.width && rect.height);
+
+		if (!clientRects.length) {
+			return cloneDOMRect(element.getBoundingClientRect());
+		}
+
+		const containingRect = clientRects.find(
+			(rect) => x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom,
+		);
+
+		if (containingRect) {
+			return cloneDOMRect(containingRect);
+		}
+
+		return cloneDOMRect(
+			clientRects.reduce((closestRect, rect) =>
+				getPointDistanceToRect(rect, x, y) < getPointDistanceToRect(closestRect, x, y) ? rect : closestRect,
+			),
+		);
+	}
+
+	function getPointDistanceToRect(rect: DOMRect, x: number, y: number) {
+		const dx = Math.max(rect.left - x, 0, x - rect.right);
+		const dy = Math.max(rect.top - y, 0, y - rect.bottom);
+
+		return dx * dx + dy * dy;
+	}
+
+	function cloneDOMRect(rect: DOMRect) {
+		return new DOMRect(rect.x, rect.y, rect.width, rect.height);
 	}
 
 	function resetReaderMenu(resetAll = true) {
@@ -777,6 +812,7 @@
 		if (resetAll) {
 			readerMenuBookElement = undefined;
 			readerMenuRangeElement = undefined;
+			readerMenuAnchorRect = undefined;
 			$readerActionSubtitle$ = undefined;
 		}
 	}
@@ -909,6 +945,7 @@
 
 <ReaderMenu
 	range={readerMenuRangeElement}
+	anchorRect={readerMenuAnchorRect}
 	subtitle={$readerActionSubtitle$}
 	bind:this={readerMenuElement}
 	on:close={() => resetReaderMenu()}

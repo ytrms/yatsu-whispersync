@@ -1,6 +1,6 @@
 <script lang="ts">
 	import ActionButtonList from './ActionButtonList.svelte';
-	import { computePosition, flip, inline, offset, autoUpdate, type Placement } from '@floating-ui/dom';
+	import { computePosition, flip, inline, offset, autoUpdate, shift, type Placement } from '@floating-ui/dom';
 	import Icon from './Icon.svelte';
 	import { Action } from '../lib/actions';
 	import type { Context, Subtitle } from '../lib/general';
@@ -10,6 +10,7 @@
 	import { createEventDispatcher, getContext, onDestroy, tick } from 'svelte';
 
 	export let range: Range | undefined;
+	export let anchorRect: DOMRect | undefined;
 	export let subtitle: Subtitle | undefined;
 
 	export function isInReaderMenu(element: Element | null) {
@@ -45,7 +46,7 @@
 		togglePlaybackTitle = 'Toggle playback';
 	}
 
-	$: setupMenu(range);
+	$: setupMenu(range, anchorRect);
 
 	onDestroy(() => cleanup?.());
 
@@ -53,7 +54,7 @@
 		dispatch('close');
 	}
 
-	async function setupMenu(rangeElement: Range | undefined) {
+	async function setupMenu(rangeElement: Range | undefined, _: DOMRect | undefined) {
 		cleanup?.();
 
 		if (rangeElement) {
@@ -65,22 +66,27 @@
 
 	function updatePosition() {
 		const activeRange = range;
+		const activeAnchorRect = anchorRect;
 
-		if (!activeRange) {
+		if (!activeRange && !activeAnchorRect) {
 			return;
 		}
 
 		computePosition(
 			{
-				getBoundingClientRect: () => activeRange.getBoundingClientRect(),
+				getBoundingClientRect: () => activeAnchorRect || activeRange!.getBoundingClientRect(),
 				// @ts-expect-error
 				getClientRects: () => {
+					if (activeAnchorRect) {
+						return [activeAnchorRect];
+					}
+
 					if (!isPaginated) {
-						return activeRange.getClientRects();
+						return activeRange!.getClientRects();
 					}
 
 					const rect1 = getReferencePoints();
-					const clientRects = [...activeRange.getClientRects()];
+					const clientRects = [...activeRange!.getClientRects()];
 					const visibleRects = clientRects.filter(
 						(rect2) =>
 							rect2.bottom > rect1.top &&
@@ -105,6 +111,10 @@
 					inline(),
 					flip({
 						fallbackPlacements,
+					}),
+					shift({
+						padding: 8,
+						crossAxis: true,
 					}),
 				],
 			},
