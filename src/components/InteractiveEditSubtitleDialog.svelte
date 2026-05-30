@@ -38,7 +38,7 @@
 	export let resolver: (arg0: EditSubtitleResult) => void;
 
 	const startTime = subtitleRegions[0].startSeconds;
-	const color = getComputedStyle(document.documentElement).getPropertyValue('--ttu-whispersync-color');
+	const color = getComputedStyle(document.documentElement).getPropertyValue('--yatsu-whispersync-color');
 	const dispatch = createEventDispatcher<{
 		close: void;
 	}>();

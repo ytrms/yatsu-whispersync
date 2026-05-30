@@ -10,6 +10,7 @@
 		"vite.ext.config.ts",
 		"vite.tm.script.config.ts",
 		"vite.vm.script.config.ts",
+		"vitest.config.ts",
 		"src/manifest.config.ts",
 		"package.json"
 	]

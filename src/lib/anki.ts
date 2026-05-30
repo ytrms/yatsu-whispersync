@@ -268,7 +268,7 @@ async function createFileNameHash(encoder: TextEncoder, name: string) {
 function getCoverData(coverFormat: string) {
 	return new Promise<string[]>((resolve, reject) => {
 		const canvas = document.createElement('canvas');
-		const img = document.querySelector<HTMLImageElement>('#ttu-whispersync-cover');
+		const img = document.querySelector<HTMLImageElement>('#yatsu-whispersync-cover');
 
 		if (!img) {
 			return reject(new Error('cover element not found'));

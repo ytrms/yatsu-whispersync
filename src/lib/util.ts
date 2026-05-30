@@ -1,6 +1,7 @@
 import type { EventWithElement } from './general';
+import type { SettingsStore } from './stores';
+import { APP_PREFIX, LEGACY_APP_PREFIX } from './prefixes';
 import { getDefaultSetting } from './settings';
-import { type SettingsStore } from './stores';
 import { tick } from 'svelte';
 
 async function _onNumberFieldChange(
@@ -50,7 +51,9 @@ export class AbortError extends Error {
 	name = 'AbortError';
 }
 
-export const baseLineCSSClass = `ttu-whispersync-line-highlight-`;
+export const baseLineCSSClass = `${APP_PREFIX}-line-highlight-`;
+export const legacyBaseLineCSSClass = `${LEGACY_APP_PREFIX}-line-highlight-`;
+const lineCSSClasses = [baseLineCSSClass, legacyBaseLineCSSClass];
 
 export const allIgnoredElements = new Set(['rp', 'rt']);
 
@@ -97,12 +100,11 @@ export function interactWithSandbox<T>(sandboxElement: HTMLIFrameElement, payloa
 }
 
 export function getTimeParts(s: number) {
-	const hours = Math.floor(s / 3600);
-	const hoursDiff = s - hours * 3600;
-	const minutes = Math.floor(hoursDiff / 60);
-	const minutesDiff = hoursDiff - minutes * 60;
-	const seconds = Math.floor(minutesDiff);
-	const ms = Math.round((minutesDiff - seconds) * 1000);
+	const totalMs = Math.max(0, Math.round(s * 1000));
+	const hours = Math.floor(totalMs / 3600000);
+	const minutes = Math.floor((totalMs % 3600000) / 60000);
+	const seconds = Math.floor((totalMs % 60000) / 1000);
+	const ms = totalMs % 1000;
 
 	return [hours, minutes, seconds, ms];
 }
@@ -114,19 +116,20 @@ export function toTimeStamp(s: number) {
 }
 
 export function getLineCSSSelector() {
-	return `span[class^='${baseLineCSSClass}']`;
+	return lineCSSClasses.map((cssClass) => `span[class^='${cssClass}']`).join(',');
 }
 
 export function getSubtitleIdFromElement(element: Element) {
-	return (
-		[...element.classList]
-			.find((cssClass) => cssClass.startsWith(baseLineCSSClass))
-			?.replace(baseLineCSSClass, '') || 'not existing'
+	const cssClass = [...element.classList].find((className) =>
+		lineCSSClasses.some((lineCSSClass) => className.startsWith(lineCSSClass)),
 	);
+	const lineCSSClass = lineCSSClasses.find((className) => cssClass?.startsWith(className));
+
+	return cssClass && lineCSSClass ? cssClass.replace(lineCSSClass, '') : 'not existing';
 }
 
 export function getLineCSSSelectorForId(id: string) {
-	return `span.${baseLineCSSClass}${id}`;
+	return lineCSSClasses.map((cssClass) => `span.${cssClass}${id}`).join(',');
 }
 
 export function getBaseLineCSSSelectorForId(id: string) {

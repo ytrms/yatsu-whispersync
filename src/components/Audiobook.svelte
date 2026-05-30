@@ -872,7 +872,7 @@
 		on:click={onSetAudioFile}
 	>
 		{#if $currentCoverUrl$}
-			<img id="ttu-whispersync-cover" class="cover" src={$currentCoverUrl$} alt="cover" on:load={imageLoaded} />
+			<img id="yatsu-whispersync-cover" class="cover" src={$currentCoverUrl$} alt="cover" on:load={imageLoaded} />
 		{:else}
 			<div class="cover cover-placeholder">
 				<svg
@@ -1159,7 +1159,7 @@
 				preferNativeFilesystem
 				height="100%"
 				dragClasses="on-drag"
-				filePickerId="ttu-whispersync-file"
+				filePickerId="yatsu-whispersync-file"
 				label={$isMobile$
 					? 'Click this zone / above icons to select subtitle/audio files'
 					: 'Click this zone / above icons or drag-and-drop to select subtitle/audio files'}
@@ -1200,7 +1200,7 @@
 			on:loadstart={onAudioLoad}
 			on:loaded={() => subtitleListElement?.onResetList()}
 			on:error={() => {
-				setAudioContext($currentCoverUrl$, $currentCoverUrl$).finally(() => {
+				setAudioContext($currentCoverUrl$, $currentAudioSourceUrl$).finally(() => {
 					$lastError$ = 'Unable to play audio - try a different codec/format';
 					$isLoading$ = false;
 				});

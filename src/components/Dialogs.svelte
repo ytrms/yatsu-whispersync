@@ -28,14 +28,14 @@
 
 {#if dialog}
 	<div
-		class="ttu-whispersync-dialog writing-horizontal-tb fixed inset-0 w-full h-full"
+		class="yatsu-whispersync-dialog writing-horizontal-tb fixed inset-0 w-full h-full"
 		style:z-index={zIndex}
 		use:portalToBody
 		on:wheel|passive|stopPropagation
 	>
 		<div tabindex="0" role="button" class="absolute inset-0 tap-highlight-transparent bg-black/[.32]" />
 		<div
-			class="ttu-whispersync-container dialog-container relative top-1/2 left-1/2 inline-block -translate-x-1/2 -translate-y-1/2"
+			class="yatsu-whispersync-container dialog-container relative top-1/2 left-1/2 inline-block -translate-x-1/2 -translate-y-1/2"
 		>
 			{#if typeof dialog.component === 'string'}
 				{@html dialog.component}

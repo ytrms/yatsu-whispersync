@@ -1,4 +1,5 @@
 import { getDefaultSetting, type Settings } from '../settings';
+import { migrateLocalStorageKey } from '../prefixes';
 import { writable } from 'svelte/store';
 
 export function createWriteableStore<T>(mapFromString: (s: string) => T, mapToString: (t: T) => string) {
@@ -45,8 +46,8 @@ export function createWriteableStore<T>(mapFromString: (s: string) => T, mapToSt
 
 function getStoredOrDefault() {
 	return <T>(key: string, defaultVal: T, mapFn: (s: string) => T) => {
-		const stored = window.localStorage.getItem(key);
+		const stored = migrateLocalStorageKey(window.localStorage, key);
 
-		return stored ? mapFn(stored) : defaultVal;
+		return stored !== null ? mapFn(stored) : defaultVal;
 	};
 }

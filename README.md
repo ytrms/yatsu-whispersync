@@ -35,6 +35,7 @@ Install it with a userscript manager such as
 ```bash
 pnpm install
 pnpm run check
+pnpm run test
 pnpm run build
 ```
 

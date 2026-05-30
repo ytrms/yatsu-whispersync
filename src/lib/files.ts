@@ -346,7 +346,7 @@ export async function getFileHandle(
 ) {
 	const [handle] = await window.showOpenFilePicker({
 		excludeAcceptAllOption: true,
-		id: 'ttu-whispersync-file',
+		id: 'yatsu-whispersync-file',
 		types: [
 			{
 				description,

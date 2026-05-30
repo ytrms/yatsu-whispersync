@@ -34,6 +34,7 @@
 	const { isIOS } = getContext<Context>('context');
 	const { matchLineIgnoreRp$, matchLineSimilarityThreshold$, matchLineMaxAttempts$ } = settings$;
 	const dispatch = createEventDispatcher<{ selectHint: void; hintSelected: void }>();
+	const startHintSelector = '*[data-yatsu-whispersync-start-node],*[data-ttu-whispersync-start-node]';
 
 	let bookHTML: HTMLElement | undefined;
 	let cancelToken = new AbortController();
@@ -139,7 +140,7 @@
 							startHintNodeContent === node.textContent && getTTUParent(node)?.id === startHintParentId;
 
 						if (passedStartNode) {
-							node.parentElement!.dataset.ttuWhispersyncStartNode = '';
+							node.parentElement!.dataset.yatsuWhispersyncStartNode = '';
 						}
 					}
 
@@ -396,7 +397,7 @@
 			const matchedWlker = document.createTreeWalker(bookHTML, NodeFilter.SHOW_TEXT, {
 				acceptNode(node) {
 					if (hasHint && !passedStartNode) {
-						passedStartNode = !!node.parentElement?.closest('*[data-ttu-whispersync-start-node]');
+						passedStartNode = !!node.parentElement?.closest(startHintSelector);
 					}
 
 					if (passedStartNode) {
@@ -474,9 +475,9 @@
 			)}%)`;
 
 			if (bookHTML.firstElementChild instanceof HTMLElement) {
-				bookHTML.firstElementChild.dataset.ttuWhispersyncMatchedBy = $currentSubtitleFile$!.name;
-				bookHTML.firstElementChild.dataset.ttuWhispersyncMatchedOn = `${Date.now()}`;
-				bookHTML.firstElementChild.dataset.ttuWhispersyncMatchedSource = 'default';
+				bookHTML.firstElementChild.dataset.yatsuWhispersyncMatchedBy = $currentSubtitleFile$!.name;
+				bookHTML.firstElementChild.dataset.yatsuWhispersyncMatchedOn = `${Date.now()}`;
+				bookHTML.firstElementChild.dataset.yatsuWhispersyncMatchedSource = 'default';
 			}
 		} catch (error: any) {
 			lineMatchRate = 'n/a';

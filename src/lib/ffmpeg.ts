@@ -10,7 +10,7 @@ import { settings$ } from './stores';
 const ffmpeg = new FFmpeg();
 const isChromeExtension = !!window.chrome && !!chrome.runtime && chrome.runtime.id;
 const isTampermonkeyScript = !!window.GM_info && window.GM_info.scriptHandler === 'Tampermonkey';
-const tamperMonkeyCacheKey = 'ttu-whispersync-tampermonkey';
+const tamperMonkeyCacheKey = 'yatsu-whispersync-tampermonkey';
 const libMap = new Map<string, string>([
 	['ogg', 'libvorbis'],
 	['opus', 'opus'],

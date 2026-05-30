@@ -153,7 +153,7 @@
 </script>
 
 <div
-	class="ttu-whispersync-container popover reader-menu"
+	class="yatsu-whispersync-container popover reader-menu"
 	class:flex-col={isVertical}
 	class:hidden={!range}
 	bind:this={popoverElement}

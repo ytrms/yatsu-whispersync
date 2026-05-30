@@ -12,7 +12,9 @@
 		"build:all": "vite -c vite.tm.script.config.ts build && vite -c vite.vm.script.config.ts build && vite -c vite.ext.config.ts build",
 		"build:dev": "vite -c vite.tm.script.config.ts build -m devevlopment && vite -c vite.vm.script.config.ts build -m devevlopment",
 		"build:ext": "vite -c vite.ext.config.ts build",
-		"check": "svelte-check --tsconfig ./tsconfig.json"
+		"check": "svelte-check --tsconfig ./tsconfig.json",
+		"test": "vitest run",
+		"test:watch": "vitest"
 	},
 	"devDependencies": {
 		"@crxjs/vite-plugin": "2.0.0-beta.26",
@@ -31,7 +33,8 @@
 		"typescript": "^5.2.2",
 		"vite": "^5.1.0",
 		"vite-plugin-node-polyfills": "^0.21.0",
-		"vite-plugin-singlefile": "^2.0.0"
+		"vite-plugin-singlefile": "^2.0.0",
+		"vitest": "^1.6.1"
 	},
 	"dependencies": {
 		"@breezystack/lamejs": "^1.2.7",

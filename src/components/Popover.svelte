@@ -50,7 +50,7 @@
 	</button>
 	{#if isOpen}
 		<div
-			class="ttu-whispersync-container popover"
+			class="yatsu-whispersync-container popover"
 			bind:this={popoverElement}
 			use:portalToBody
 			use:clickOutside={({ target }) => {

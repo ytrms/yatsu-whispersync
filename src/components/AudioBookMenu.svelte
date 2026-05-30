@@ -9,6 +9,7 @@
 	import { setBooksDB } from '../lib/db';
 	import { setAudioContext, setSubtitleContext, updateAudio, updateSubtitles, verifyPermissions } from '../lib/files';
 	import { type Context, Tabs, type Subtitle, getDummySubtitle } from '../lib/general';
+	import { getLegacyStorageKey, migrateLocalStorageKey } from '../lib/prefixes';
 	import { AudioProcessor, ReaderMenuOpenMode, ReaderMenuPauseMode } from '../lib/settings';
 	import {
 		activeSubtitle$,
@@ -88,7 +89,7 @@
 	export let sandboxElement: HTMLIFrameElement | undefined;
 	export let currentBookId: number;
 
-	const sideMenuWidthKey = 'ttu-whispersync-side-menu-width';
+	const sideMenuWidthKey = 'yatsu-whispersync-side-menu-width';
 	const supportsFileSystem = 'showOpenFilePicker' in window;
 	const isVertical = (window.localStorage.getItem('writingMode') || 'vertical-rl') === 'vertical-rl';
 	const isPaginated = (window.localStorage.getItem('viewMode') || 'paginated') === 'paginated';
@@ -140,7 +141,7 @@
 	let showMenu = false;
 	let loadError = '';
 	let sideMenuWidth = window.matchMedia('(min-width: 1000px)').matches
-		? window.localStorage.getItem(sideMenuWidthKey) || ''
+		? getStoredSideMenuWidth()
 		: '';
 	let originalMenuWidth = 0;
 	let originalMouseX = 0;
@@ -389,9 +390,7 @@
 		resizeTimer = window.setTimeout(() => {
 			resizeTimer = undefined;
 
-			sideMenuWidth = window.matchMedia('(min-width: 1000px)').matches
-				? window.localStorage.getItem(sideMenuWidthKey) || ''
-				: '';
+			sideMenuWidth = window.matchMedia('(min-width: 1000px)').matches ? getStoredSideMenuWidth() : '';
 			audiobookComponent?.resetSubtitleContainerHeight();
 			audiobookComponent?.scrollToSubtitle();
 		}, 1000);
@@ -417,6 +416,10 @@
 
 		window.localStorage.setItem(sideMenuWidthKey, sideMenuWidth);
 		audiobookComponent?.resetSubtitleContainerHeight();
+	}
+
+	function getStoredSideMenuWidth() {
+		return migrateLocalStorageKey(window.localStorage, sideMenuWidthKey) || '';
 	}
 
 	async function initializeComponent() {
@@ -485,8 +488,16 @@
 
 			if (metadataElement instanceof HTMLElement) {
 				$bookMatched$ = {
-					matchedBy: metadataElement.dataset.ttuWhispersyncMatchedBy || '',
-					matchedOn: Number.parseInt(metadataElement.dataset.ttuWhispersyncMatchedOn || '0', 10),
+					matchedBy:
+						metadataElement.dataset.yatsuWhispersyncMatchedBy ||
+						metadataElement.dataset.ttuWhispersyncMatchedBy ||
+						'',
+					matchedOn: Number.parseInt(
+						metadataElement.dataset.yatsuWhispersyncMatchedOn ||
+							metadataElement.dataset.ttuWhispersyncMatchedOn ||
+							'0',
+						10,
+					),
 				};
 			}
 
@@ -952,7 +963,7 @@
 />
 
 <div
-	class="ttu-whispersync-container side-menu flex-col justify-between fixed top-0 left-0 h-full writing-horizontal-tb z-[60]"
+	class="yatsu-whispersync-container side-menu flex-col justify-between fixed top-0 left-0 h-full writing-horizontal-tb z-[60]"
 	class:left-0={isLeftMenu}
 	class:right-0={!isLeftMenu}
 	class:hidden={!showMenu}
@@ -1014,6 +1025,7 @@
 					sideMenuWidth = `${36 * parseFloat(window.getComputedStyle(document.documentElement).fontSize)}px`;
 
 					window.localStorage.removeItem(sideMenuWidthKey);
+					window.localStorage.removeItem(getLegacyStorageKey(sideMenuWidthKey));
 
 					audiobookComponent?.resetSubtitleContainerHeight();
 				}}

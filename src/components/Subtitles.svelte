@@ -285,7 +285,7 @@
 </script>
 
 <div
-	class="ttu-whispersync-container subtitle-container h-full w-full"
+	class="yatsu-whispersync-container subtitle-container h-full w-full"
 	style:height={containerHeight ? `${containerHeight}px` : null}
 	bind:this={virtualListElement}
 	on:pointerdown={() => (isPointerDown = true)}

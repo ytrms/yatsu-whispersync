@@ -40,7 +40,7 @@
 		subtitleChange$,
 		type SettingsStore,
 	} from '../lib/stores';
-	import { between, interactWithSandbox, onNumberFieldChange, toTimeStamp } from '../lib/util';
+	import { between, getLineCSSSelector, interactWithSandbox, onNumberFieldChange, toTimeStamp } from '../lib/util';
 	import { mdiHelpCircle, mdiRepeatVariant, mdiTrashCan } from '@mdi/js';
 	import Popover from './Popover.svelte';
 	import SettingsCheckbox from './SettingsCheckbox.svelte';
@@ -187,30 +187,32 @@
 	async function onUpdateColorStylesNode(..._: any) {
 		await tick();
 
-		const nodeId = 'ttu-whispersync-color-styles';
+		const nodeId = 'yatsu-whispersync-color-styles';
 		const cssContents: string[] = [];
+		const activeLineSelector = getLineCSSSelectorForState('active');
+		const menuOpenLineSelector = getLineCSSSelectorForState('menu-open');
 
 		if ($readerEnableLineHighlight$ && $readerEnableLineTextHighlight$) {
 			cssContents.push(
-				`span[class^='ttu-whispersync-line-highlight-'].active,`,
-				`span[class^='ttu-whispersync-line-highlight-'].menu-open `,
+				`${activeLineSelector},`,
+				`${menuOpenLineSelector} `,
 				`{color: ${$readerLineTextHighlightColor$};background-color: ${$readerLineHighlightColor$};}`,
 			);
 		} else if ($readerEnableLineHighlight$) {
 			cssContents.push(
-				`span[class^='ttu-whispersync-line-highlight-'].active,`,
-				`span[class^='ttu-whispersync-line-highlight-'].menu-open `,
+				`${activeLineSelector},`,
+				`${menuOpenLineSelector} `,
 				`{background-color: ${$readerLineHighlightColor$};}`,
 			);
 		} else if ($readerEnableLineTextHighlight$) {
 			cssContents.push(
-				`span[class^='ttu-whispersync-line-highlight-'].active,`,
-				`span[class^='ttu-whispersync-line-highlight-'].menu-open `,
+				`${activeLineSelector},`,
+				`${menuOpenLineSelector} `,
 				`{color: ${$readerLineTextHighlightColor$};}`,
 			);
 		} else {
 			cssContents.push(
-				`span[class^='ttu-whispersync-line-highlight-'].menu-open `,
+				`${menuOpenLineSelector} `,
 				`{color: ${$readerLineTextHighlightColor$};background-color: ${$readerLineHighlightColor$};}`,
 			);
 		}
@@ -228,6 +230,13 @@
 
 		styleElement.appendChild(textNode);
 		document.head.append(styleElement);
+	}
+
+	function getLineCSSSelectorForState(stateClass: string) {
+		return getLineCSSSelector()
+			.split(',')
+			.map((selector) => `${selector}.${stateClass}`)
+			.join(',');
 	}
 
 	async function onChangePersistSubtitles() {
