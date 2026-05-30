@@ -17,6 +17,7 @@ describe('default settings', () => {
 		expect(defaults['yatsu-whispersync-reader-line-text-highlight-color']).toBe('#0f172a');
 		expect(defaults['yatsu-whispersync-reader-enable-auto-reload']).toBe(true);
 		expect(defaults['yatsu-whispersync-reader-enable-filesystem-api']).toBe(true);
+		expect(defaults['yatsu-whispersync-reader-enable-vn-mode']).toBe(false);
 		expect(defaults['yatsu-whispersync-reader-scroll-behavior']).toBe(ReaderScrollBehavior.INSTANT);
 		expect(defaults['yatsu-whispersync-reader-menu-open-mode']).toBe(ReaderMenuOpenMode.CLICK);
 		expect(defaults['yatsu-whispersync-subtitles-actions-visibility']).toBe(SubtitleActionsVisibility.HOVER);

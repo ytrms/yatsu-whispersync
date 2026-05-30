@@ -21,9 +21,11 @@ describe('userscript metadata', () => {
 	for (const config of userscriptConfigs) {
 		it(`keeps ${config.name} builds targeted at Yatsu`, () => {
 			const source = readFileSync(resolve(process.cwd(), config.path), 'utf8');
+			const packageJson = JSON.parse(readFileSync(resolve(process.cwd(), 'package.json'), 'utf8'));
 
 			expect(source).toContain('const outName =');
 			expect(source).toContain(config.output);
+			expect(source).toContain(`// @version     ${packageJson.version}`);
 			expect(source).toContain('// @name        Yatsu Whispersync');
 			expect(source).toContain('// @description Listen to audiobooks with Yatsu Reader');
 			expect(source).toContain('// @match       https://app.yatsu.moe/*');

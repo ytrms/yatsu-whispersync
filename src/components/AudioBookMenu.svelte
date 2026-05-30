@@ -69,6 +69,16 @@
 		toTimeStamp,
 		between,
 	} from '../lib/util';
+	import {
+		createVisualNovelPageSubtitleState,
+		filterAlreadyStartedLeadingSubtitles,
+		filterPreviouslyVisibleLeadingSubtitles,
+		getVisualNovelBookContentElement,
+		isForwardVisualNovelPageChange,
+		shouldPlayVisualNovelPageChange,
+		type VisualNovelPageChangeDetail,
+		type VisualNovelPageSubtitleState,
+	} from '../lib/visualNovel';
 	import { portalToBody } from '../lib/portal';
 	import Match from './Match.svelte';
 	import {
@@ -92,9 +102,11 @@
 	const sideMenuWidthKey = 'yatsu-whispersync-side-menu-width';
 	const supportsFileSystem = 'showOpenFilePicker' in window;
 	const isVertical = (window.localStorage.getItem('writingMode') || 'vertical-rl') === 'vertical-rl';
-	const isPaginated = (window.localStorage.getItem('viewMode') || 'paginated') === 'paginated';
+	const viewMode = window.localStorage.getItem('viewMode') || 'paginated';
+	const isPaginated = viewMode === 'paginated';
+	const isPageBasedReader = isPaginated || viewMode === 'visual-novel';
 	const firstDimensionMargin = `-${window.localStorage.getItem('firstDimensionMargin') || 0}px`;
-	const readerIntersectionObserver: IntersectionObserver | undefined = isPaginated
+	const readerIntersectionObserver: IntersectionObserver | undefined = isPageBasedReader
 		? undefined
 		: new IntersectionObserver(onIntersection, {
 				rootMargin: isVertical
@@ -109,6 +121,7 @@
 	const {
 		readerEnableAutoReload$,
 		readerEnableFilesystemApi$,
+		readerEnableVNMode$,
 		readerPreventActionOnSelection$,
 		readerEnableMenuTarget$,
 		readerClickAction$,
@@ -148,6 +161,8 @@
 	let originalPos = 0;
 	let posDiff = 0;
 	let resizeTimer: number | undefined;
+	let visualNovelPlaybackTimer: number | undefined;
+	let visualNovelPageSubtitleState: VisualNovelPageSubtitleState | undefined;
 
 	$isMobile$ = navigator.maxTouchPoints > 0;
 
@@ -295,6 +310,7 @@
 
 		document.removeEventListener('ttsu:skipKeyListener', onSkipKeyListener, false);
 		document.removeEventListener('ttsu:page.change', onPageChange, false);
+		clearTimeout(visualNovelPlaybackTimer);
 
 		readerIntersectionObserver?.disconnect();
 
@@ -521,9 +537,7 @@
 			return;
 		}
 
-		if (isPaginated) {
-			document.addEventListener('ttsu:page.change', onPageChange, false);
-		}
+		document.addEventListener('ttsu:page.change', onPageChange, false);
 
 		await initializeComponentData();
 	}
@@ -532,8 +546,79 @@
 		$skipKeyListener$ = detail;
 	}
 
-	function onPageChange() {
+	function onPageChange(event: Event) {
 		resetReaderMenu();
+
+		if (!shouldPlayVisualNovelPage(event)) {
+			return;
+		}
+
+		clearTimeout(visualNovelPlaybackTimer);
+
+		const detail = (event as CustomEvent<VisualNovelPageChangeDetail>).detail;
+		const currentTimeOnPageChange = $currentTime$;
+
+		$paused$ = true;
+
+		visualNovelPlaybackTimer = window.setTimeout(() => {
+			visualNovelPlaybackTimer = undefined;
+			playVisibleVisualNovelPage(detail, currentTimeOnPageChange);
+		});
+	}
+
+	function shouldPlayVisualNovelPage(event: Event) {
+		const detail = (event as CustomEvent<VisualNovelPageChangeDetail>).detail;
+
+		return shouldPlayVisualNovelPageChange(detail, $readerEnableVNMode$);
+	}
+
+	function playVisibleVisualNovelPage(detail: VisualNovelPageChangeDetail | undefined, currentTimeOnPageChange: number) {
+		if (!$readerEnableVNMode$ || !$currentAudioLoaded$ || $isRecording$ || !$currentSubtitles$.size) {
+			return;
+		}
+
+		const visibleSubtitles = getVisibleVisualNovelSubtitles();
+		let subtitles = filterPreviouslyVisibleLeadingSubtitles(
+			visibleSubtitles,
+			detail,
+			visualNovelPageSubtitleState,
+		);
+
+		if (isForwardVisualNovelPageChange(detail, visualNovelPageSubtitleState)) {
+			subtitles = filterAlreadyStartedLeadingSubtitles(subtitles, currentTimeOnPageChange);
+		}
+
+		visualNovelPageSubtitleState =
+			createVisualNovelPageSubtitleState(detail, visibleSubtitles) || visualNovelPageSubtitleState;
+
+		if (!subtitles.length) {
+			return;
+		}
+
+		executeAction(Action.TOGGLE_PLAY_PAUSE, subtitles, {
+			ignoreSkipKeyListener: true,
+			suppressReaderCue: true,
+		});
+	}
+
+	function getVisibleVisualNovelSubtitles() {
+		const subtitleIds = new Set<string>();
+		const subtitleElements = getVisualNovelBookContentElement(document, bookContentElement).querySelectorAll(
+			getLineCSSSelector(),
+		);
+
+		for (let index = 0, { length } = subtitleElements; index < length; index += 1) {
+			const subtitleId = getSubtitleIdFromElement(subtitleElements[index]);
+
+			if (subtitleId !== 'not existing') {
+				subtitleIds.add(subtitleId);
+			}
+		}
+
+		return [...subtitleIds]
+			.map((subtitleId) => $currentSubtitles$.get(subtitleId))
+			.filter((subtitle): subtitle is Subtitle => !!subtitle)
+			.sort((a, b) => a.subIndex - b.subIndex);
 	}
 
 	async function initializeComponentData(forceLoad = false) {

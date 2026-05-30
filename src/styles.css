@@ -6,6 +6,12 @@
 	color: var(--yatsu-whispersync-color);
 }
 
+.yatsu-whispersync-container,
+.yatsu-whispersync-dialog {
+	text-orientation: mixed;
+	writing-mode: horizontal-tb;
+}
+
 .yatsu-whispersync-container .tabs button:not(.tab-active),
 .yatsu-whispersync-container button:disabled,
 .yatsu-whispersync-container .btn:not(:disabled):hover,

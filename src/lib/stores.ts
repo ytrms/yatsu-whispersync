@@ -159,6 +159,7 @@ export const settings$ = {
 	readerEnableFilesystemApi$: writableBooleanStore()('yatsu-whispersync-reader-enable-filesystem-api'),
 	readerEnableAutoScroll$: writableBooleanStore()('yatsu-whispersync-reader-enable-auto-scroll'),
 	readerEnableTrackerAutoPause$: writableBooleanStore()('yatsu-whispersync-reader-enable-tracker-auto-pause'),
+	readerEnableVNMode$: writableBooleanStore()('yatsu-whispersync-reader-enable-vn-mode'),
 	readerPreventActionOnSelection$: writableBooleanStore()('yatsu-whispersync-reader-prevent-action-on-selection'),
 	readerEnableMenuTarget$: writableBooleanStore()('yatsu-whispersync-reader-enable-menu-target'),
 	readerScrollMode$: writableStringStore()('yatsu-whispersync-reader-scroll-mode'),

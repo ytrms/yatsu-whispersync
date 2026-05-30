@@ -98,6 +98,7 @@
 		readerEnableLineHighlight$,
 		readerEnableLineTextHighlight$,
 		readerEnableAutoScroll$,
+		readerEnableVNMode$,
 		readerScrollMode$,
 		readerClickAction$,
 		readerMenuOpenMode$,
@@ -562,6 +563,11 @@
 			label="Enable auto scroll"
 			helpText="If enabled the reader will automatically scroll to active subtitles - requires matched book/line and subtitle/audio file"
 			targetStore$={readerEnableAutoScroll$}
+		/>
+		<SettingsCheckbox
+			label="VN Mode"
+			helpText="If enabled, Yatsu Visual Novel page flips play the visible matched subtitle range and stop at the end of the current VN screen"
+			targetStore$={readerEnableVNMode$}
 		/>
 		{#if $readerEnableAutoScroll$}
 			<SettingsCheckbox

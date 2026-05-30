@@ -149,6 +149,7 @@
 	let pausedByAutoPause = false;
 	let isLoopAction = false;
 	let actionTimeIndex = -1;
+	let suppressReaderCue = false;
 	let originalCurrentTime = -1;
 	let originalPlaybackRate = -1;
 	let skipNextCue = false;
@@ -445,6 +446,7 @@
 			actionEndTimes = [];
 			actionTimeIndex = -1;
 			isLoopAction = false;
+			suppressReaderCue = false;
 			$paused$ = true;
 
 			return resetRecorderContext();
@@ -465,6 +467,7 @@
 			actionStartTimes = [];
 			actionEndTimes = [];
 			isLoopAction = false;
+			suppressReaderCue = false;
 			$paused$ = true;
 
 			if (recorderSuccess) {
@@ -614,6 +617,7 @@
 		const executeAction = action !== Action.RESTART_PLAYBACK;
 
 		({ recorderSuccess, recorderFailure } = data);
+		suppressReaderCue = !!data.suppressReaderCue;
 
 		if (skipUpdates || recorderSuccess) {
 			originalCurrentTime = originalCurrentTime > -1 ? originalCurrentTime : $currentTime$;
@@ -740,7 +744,7 @@
 
 		updateCSSClasses(id);
 
-		if (originalCurrentTime === -1 && $readerEnableAutoScroll$ && !skipNextCue) {
+		if (originalCurrentTime === -1 && $readerEnableAutoScroll$ && !skipNextCue && !suppressReaderCue) {
 			document.dispatchEvent(
 				new CustomEvent('ttu-action', {
 					detail: {

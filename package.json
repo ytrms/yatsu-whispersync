@@ -2,7 +2,7 @@
 	"name": "yatsu-whispersync",
 	"description": "Listen to audiobooks with Yatsu Reader",
 	"private": true,
-	"version": "1.0.17",
+	"version": "1.0.18",
 	"type": "module",
 	"scripts": {
 		"dev:tm": "vite -w -c vite.tm.script.config.ts build -m devevlopment",

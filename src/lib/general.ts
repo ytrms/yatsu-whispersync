@@ -79,6 +79,7 @@ export interface PlayLineData {
 	subtitles: Subtitle[];
 	skipUpdates?: boolean;
 	keepPauseState?: boolean;
+	suppressReaderCue?: boolean;
 	recorderSuccess?: (audioBuffer: ArrayBuffer | undefined) => void;
 	recorderFailure?: (error: any) => void;
 }

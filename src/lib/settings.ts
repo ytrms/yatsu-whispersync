@@ -92,6 +92,7 @@ export type Settings = {
 	'yatsu-whispersync-reader-enable-filesystem-api': boolean;
 	'yatsu-whispersync-reader-enable-auto-scroll': boolean;
 	'yatsu-whispersync-reader-enable-tracker-auto-pause': boolean;
+	'yatsu-whispersync-reader-enable-vn-mode': boolean;
 	'yatsu-whispersync-reader-prevent-action-on-selection': boolean;
 	'yatsu-whispersync-reader-enable-menu-target': boolean;
 	'yatsu-whispersync-reader-scroll-mode': ReaderScrollMode;
@@ -254,6 +255,7 @@ export function getDefaultSettings(): Settings {
 		'yatsu-whispersync-reader-enable-filesystem-api': true,
 		'yatsu-whispersync-reader-enable-auto-scroll': true,
 		'yatsu-whispersync-reader-enable-tracker-auto-pause': true,
+		'yatsu-whispersync-reader-enable-vn-mode': false,
 		'yatsu-whispersync-reader-prevent-action-on-selection': true,
 		'yatsu-whispersync-reader-enable-menu-target': true,
 		'yatsu-whispersync-reader-scroll-mode': ReaderScrollMode.ALWAYS,

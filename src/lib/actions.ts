@@ -275,6 +275,7 @@ export interface ActionSettings {
 	mergeSubtitles?: boolean;
 	skipUpdates?: boolean;
 	keepPauseState?: boolean;
+	suppressReaderCue?: boolean;
 	persistAlignment?: boolean;
 	ignoreSkipKeyListener?: boolean;
 }
@@ -354,6 +355,7 @@ export async function executeAction(
 			subtitles,
 			skipUpdates: settings.skipUpdates,
 			keepPauseState: settings.keepPauseState,
+			suppressReaderCue: settings.suppressReaderCue,
 		});
 	} else if (action === Action.TOGGLE_BOOKMARK) {
 		executeFilterAction(bookmarkedSubtitles$, subtitles[0].id);
