@@ -27,7 +27,7 @@ describe('userscript metadata', () => {
 			expect(source).toContain('// @name        Yatsu Whispersync');
 			expect(source).toContain('// @description Listen to audiobooks with Yatsu Reader');
 			expect(source).toContain('// @match       https://app.yatsu.moe/*');
-			expect(source).not.toContain('// @match       http://localhost:5173/*');
+			expect(source).toContain('// @match       http://localhost:5173/*');
 			expect(source).toContain('// @icon https://docs.yatsu.moe/assets/ya.svg');
 			expect(source).toContain('// @homepageURL https://github.com/ytrms/yatsu-whispersync');
 			expect(source).toContain(config.updateUrl);
@@ -39,6 +39,8 @@ describe('userscript metadata', () => {
 		const tampermonkeySource = readFileSync(resolve(process.cwd(), 'vite.tm.script.config.ts'), 'utf8');
 
 		for (const source of [violentmonkeySource, tampermonkeySource]) {
+			expect(source).toContain('Original author: Renji-xD, with modifications by ytrms');
+			expect(source).not.toContain('ryzusaku');
 			expect(source).toContain('Yatsu Whispersync is adapted from ttu-whispersync');
 			expect(source).toContain('https://github.com/Renji-XD/ttu-whispersync');
 		}

@@ -10,10 +10,11 @@ import { writeFileSync } from 'fs';
 const outDir = 'violent_monkey';
 const outName = 'yatsu-whispersync.user.js';
 const header = `// ==UserScript==
-// @author      Original author: Renji-xD, with modifications by ryzusaku and ytrms
+// @author      Original author: Renji-xD, with modifications by ytrms
 // @name        Yatsu Whispersync
 // @namespace   https://github.com/Renji-XD
 // @match       https://app.yatsu.moe/*
+// @match       http://localhost:5173/*
 // @version     1.0.17
 // @description Listen to audiobooks with Yatsu Reader
 // @icon https://docs.yatsu.moe/assets/ya.svg

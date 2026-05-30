@@ -16,11 +16,12 @@ const header = `// ==UserScript==
 // @description Listen to audiobooks with Yatsu Reader
 // @icon https://docs.yatsu.moe/assets/ya.svg
 // @grant       GM_getResourceURL
-// @author      Original author: Renji-xD, with modifications by ryzusaku and ytrms
+// @author      Original author: Renji-xD, with modifications by ytrms
 // @homepageURL https://github.com/ytrms/yatsu-whispersync
 // @resource mediaInfo https://cdn.jsdelivr.net/npm/mediainfo.js@0.2.1/dist/MediaInfoModule.wasm
 // @resource ffmpeg-core.js https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.6/dist/esm/ffmpeg-core.js
 // @match       https://app.yatsu.moe/*
+// @match       http://localhost:5173/*
 // @run-at      document-idle
 // @noframes
 // @updateURL   https://github.com/ytrms/yatsu-whispersync/releases/latest/download/yatsu-whispersync.tm.user.js
