@@ -1076,7 +1076,7 @@
 				<Icon path={mdiClose} />
 			</button>
 			<div title="Getting started" class:m-l-b={isLeftMenu} class:m-r-b={!isLeftMenu}>
-				<Popover>
+				<Popover mode="hover">
 					<div slot="icon">
 						<Icon path={mdiHelpCircle} />
 					</div>

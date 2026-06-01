@@ -781,6 +781,29 @@
 	backdrop-filter: blur(12px);
 }
 
+.yatsu-whispersync-container.tooltip {
+	background: var(--yatsu-whispersync-panel-bg);
+	border: 1px solid var(--yatsu-whispersync-panel-border);
+	border-radius: 0.65rem;
+	box-shadow:
+		0 18px 36px -28px rgba(15, 23, 42, 0.58),
+		0 8px 18px -16px rgba(15, 23, 42, 0.34);
+	color: var(--yatsu-whispersync-panel-fg);
+	font-size: 0.78rem;
+	font-weight: 700;
+	left: 0;
+	line-height: 1.25;
+	max-width: min(18rem, calc(100vw - 1rem));
+	padding: 0.42rem 0.56rem;
+	pointer-events: none;
+	position: absolute;
+	top: 0;
+	-webkit-backdrop-filter: blur(12px);
+	backdrop-filter: blur(12px);
+	white-space: normal;
+	z-index: 90;
+}
+
 .yatsu-whispersync-container.reader-menu:not(.hidden) {
 	align-items: center;
 	display: inline-flex;

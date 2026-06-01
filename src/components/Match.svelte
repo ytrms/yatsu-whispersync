@@ -813,7 +813,7 @@
 		</div>
 		<div>Book diff rate</div>
 		<div>{bookSubtitleDiffRate}</div>
-		<Popover>
+		<Popover mode="hover">
 			<div slot="icon">
 				<Icon path={mdiHelpCircle} />
 			</div>
@@ -872,7 +872,7 @@
 		<button class="btn m-r-s" on:click={onDownloadSubtitles}>Download</button>
 	{/if}
 	<button class="btn m-r-s" disabled={maxProgress > 0} on:click={onMatchSubtitles}>Parse</button>
-	<Popover placement="top">
+	<Popover placement="top" mode="hover">
 		<div slot="icon">
 			<Icon path={mdiInformation} />
 		</div>

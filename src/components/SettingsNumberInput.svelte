@@ -42,7 +42,7 @@
 	}}
 	use:skipKeys={{ document, isSkipped: $skipKeyListener$ }}
 />
-<Popover>
+<Popover mode="hover">
 	<div slot="icon">
 		<Icon path={mdiHelpCircle} />
 	</div>

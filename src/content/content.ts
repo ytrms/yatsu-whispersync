@@ -1,6 +1,7 @@
 import AudioBookMenu from '../components/AudioBookMenu.svelte';
 import { Action, defaultFooterActionList, type ActionListItem } from '../lib/settings';
 import { APP_PREFIX, getLegacyStorageKey, migrateLocalStorageKey } from '../lib/prefixes';
+import { installInstantTooltips } from '../lib/tooltips';
 import pageStyles from '../styles.css?inline';
 
 const stylesId = `${APP_PREFIX}-styles`;
@@ -68,6 +69,7 @@ async function mountReader(bookId: number) {
 
 		migrateFooterActions();
 		ensurePageStyles();
+		installInstantTooltips();
 		removeStaleFooterHosts();
 
 		const sandboxElement = await ensureSandboxElement();

@@ -918,7 +918,7 @@
 				</option>
 			{/each}
 		</select>
-		<Popover>
+		<Popover mode="hover">
 			<div slot="icon">
 				<Icon path={mdiHelpCircle} />
 			</div>

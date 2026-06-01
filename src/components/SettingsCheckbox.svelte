@@ -13,7 +13,7 @@
 
 <label for={id}>{label}</label>
 <input type="checkbox" {id} bind:checked={$targetStore$} on:change />
-<Popover>
+<Popover mode="hover">
 	<div slot="icon">
 		<Icon path={mdiHelpCircle} />
 	</div>
