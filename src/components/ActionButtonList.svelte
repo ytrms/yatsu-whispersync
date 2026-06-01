@@ -129,7 +129,7 @@
 			title: finalTitle,
 			disabled,
 			subtitle: referenceSubtitle,
-			buttonStyles: isFooter ? `margin-left: 0.5rem;${disabled ? 'opacity: 0.4;' : ''}` : '',
+			buttonStyles: isFooter && disabled ? 'opacity: 0.4;' : '',
 			iconStyles: isFooter && disabled ? 'cursor: not-allowed;' : '',
 		};
 	}
