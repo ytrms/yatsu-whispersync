@@ -41,6 +41,7 @@
 		type SettingsStore,
 	} from '../lib/stores';
 	import { between, getLineCSSSelector, interactWithSandbox, onNumberFieldChange, toTimeStamp } from '../lib/util';
+	import { scriptVersion } from '../lib/version';
 	import { mdiHelpCircle, mdiRepeatVariant, mdiTrashCan } from '@mdi/js';
 	import Popover from './Popover.svelte';
 	import SettingsCheckbox from './SettingsCheckbox.svelte';
@@ -1044,4 +1045,5 @@
 			/>
 		</SettingsMenuContent>
 	{/if}
+	<div class="settings-version">Yatsu Whispersync v{scriptVersion}</div>
 </div>

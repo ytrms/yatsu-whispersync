@@ -1222,6 +1222,15 @@
 	min-width: 0;
 }
 
+.yatsu-whispersync-container .settings-version {
+	color: var(--yatsu-whispersync-panel-muted);
+	font-size: 0.78rem;
+	font-weight: 700;
+	margin-top: 1rem;
+	padding-block: 0.8rem 0.2rem;
+	text-align: center;
+}
+
 .yatsu-whispersync-container .sortable-list-item {
 	background: var(--yatsu-whispersync-control-bg);
 	border: 1px solid var(--yatsu-whispersync-control-border);
