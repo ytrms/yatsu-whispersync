@@ -130,6 +130,7 @@
 		playerPlaybackRateDecreaseTime$,
 		playerPlaybackRateIncreaseTime$,
 		exportAudioBitrate$,
+		exportNormalizeAudio$,
 		keybindingsEnableTimeFallback$,
 	} = settings$;
 		const { isIOS } = getContext<Context>('context');
@@ -474,12 +475,14 @@
 			$paused$ = true;
 
 			if (recorderSuccess) {
-				const audioBuffer = await stopRecording($exportAudioBitrate$).catch((error) => {
-					recorderFailure?.(error);
-					resetRecorderContext();
+				const audioBuffer = await stopRecording($exportAudioBitrate$, false, $exportNormalizeAudio$).catch(
+					(error) => {
+						recorderFailure?.(error);
+						resetRecorderContext();
 
-					return undefined;
-				});
+						return undefined;
+					},
+				);
 
 				recorderSuccess(audioBuffer);
 			}

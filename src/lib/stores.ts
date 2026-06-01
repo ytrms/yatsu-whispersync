@@ -199,6 +199,7 @@ export const settings$ = {
 	exportAudioProcessor$: writableStringStore()('yatsu-whispersync-export-audio-processor'),
 	exportAudioFormat$: writableStringStore()('yatsu-whispersync-export-audio-format'),
 	exportAudioBitrate$: writableNumberStore()('yatsu-whispersync-export-audio-bitrate'),
+	exportNormalizeAudio$: writableBooleanStore()('yatsu-whispersync-export-normalize-audio'),
 	exportCoverFormat$: writableStringStore()('yatsu-whispersync-export-cover-format'),
 	exportEnableMergeSelectionAutoClear$: writableBooleanStore()(
 		'yatsu-whispersync-export-enable-merge-selection-auto-clear',

@@ -135,6 +135,7 @@ export type Settings = {
 	'yatsu-whispersync-export-audio-processor': AudioProcessor;
 	'yatsu-whispersync-export-audio-format': AudioFormat;
 	'yatsu-whispersync-export-audio-bitrate': number;
+	'yatsu-whispersync-export-normalize-audio': boolean;
 	'yatsu-whispersync-export-cover-format': ImageFormat;
 	'yatsu-whispersync-export-enable-merge-selection-auto-clear': boolean;
 	'yatsu-whispersync-enable-ffmpeg-log': boolean;
@@ -302,6 +303,7 @@ export function getDefaultSettings(): Settings {
 		'yatsu-whispersync-export-audio-processor': AudioProcessor.RECORDER,
 		'yatsu-whispersync-export-audio-format': AudioFormat.MP3,
 		'yatsu-whispersync-export-audio-bitrate': 128,
+		'yatsu-whispersync-export-normalize-audio': true,
 		'yatsu-whispersync-export-cover-format': ImageFormat.AUTO,
 		'yatsu-whispersync-export-enable-merge-selection-auto-clear': false,
 		'yatsu-whispersync-enable-ffmpeg-log': false,

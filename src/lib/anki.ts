@@ -390,6 +390,7 @@ export async function exportToAnki(subtitlesToExport: Subtitle[][], isUpdate: bo
 	const currentCoverUrl = get(currentCoverUrl$);
 	const exportAudioFormat = get(settings$.exportAudioFormat$);
 	const exportAudioBitrate = get(settings$.exportAudioBitrate$);
+	const exportNormalizeAudio = get(settings$.exportNormalizeAudio$);
 	const exportCoverFormat = get(settings$.exportCoverFormat$);
 	const exportFieldMode = get(settings$.exportFieldMode$);
 	const ankiAddSubtitleTag = get(settings$.ankiAddSubtitleTag$);
@@ -546,6 +547,7 @@ export async function exportToAnki(subtitlesToExport: Subtitle[][], isUpdate: bo
 						exportAudioFormat,
 						exportAudioBitrate,
 						true,
+						exportNormalizeAudio,
 					);
 				} else {
 					audioBuffer = await new Promise<ArrayBuffer | undefined>((recorderSuccess, recorderFailure) =>

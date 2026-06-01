@@ -16,6 +16,7 @@ const libMap = new Map<string, string>([
 	['opus', 'opus'],
 	['mp3', 'libmp3lame'],
 ]);
+const exportAudioNormalizationFilter = 'loudnorm=I=-16:TP=-1.5:LRA=11';
 const chapterTimeMatchRegex = /chapter.+start (\d+\.\d+), end/i;
 const chapterLabelMatchRegex = /title.+:(.+)/i;
 const externalResources = new Map([
@@ -271,10 +272,12 @@ export async function getAudio(
 	audioFormat = 'mp3',
 	audioBitrate = 128,
 	forExport = false,
+	normalizeAudio = false,
 ) {
 	const fileExtension = audioFile.name.split('.').pop();
 	const enableFFMPEGLog = get(settings$.enableFFMPEGLog$);
 	const finalOutput = subtitles.length === 1 ? `audio_output_0.${audioFormat}` : `audio_output.${audioFormat}`;
+	const shouldNormalizeAudio = forExport && normalizeAudio;
 
 	let failure = '';
 	let filterInput = '';
@@ -291,6 +294,7 @@ export async function getAudio(
 
 			const subtitle = subtitles[index];
 			const output = `audio_output_${index}.${audioFormat}`;
+			const shouldNormalizeSegment = shouldNormalizeAudio && subtitles.length === 1;
 			const ffmpegArguments = [
 				'-hide_banner',
 				'-y',
@@ -302,6 +306,7 @@ export async function getAudio(
 				`${subtitle.endSeconds - subtitle.startSeconds}`,
 				...(audioFormat === AudioFormat.OPUS ? ['-strict', '-2'] : []),
 				'-vn',
+				...(shouldNormalizeSegment ? ['-af', exportAudioNormalizationFilter] : []),
 				'-acodec',
 				libMap.get(audioFormat) || 'libmp3lame',
 				...(forExport ? ['-b:a', `${audioBitrate}k`] : []),
@@ -325,6 +330,7 @@ export async function getAudio(
 			mergeInputs.push('-filter_complex');
 
 			filterInput = `${filterInput}concat=n=${subtitles.length}:v=0:a=1`;
+			filterInput = shouldNormalizeAudio ? `${filterInput},${exportAudioNormalizationFilter}` : filterInput;
 
 			const ffmpegArguments = [
 				'-hide_banner',

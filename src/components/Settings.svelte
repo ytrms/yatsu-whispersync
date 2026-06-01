@@ -842,6 +842,11 @@
 			min={64}
 			step={10}
 		/>
+		<SettingsCheckbox
+			label="Normalize audio"
+			helpText="If enabled exported Anki audio is normalized to make quiet clips more audible and loud clips less abrupt while keeping peaks below clipping."
+			targetStore$={settings$.exportNormalizeAudio$}
+		/>
 		<SettingsSelect
 			label="Image Format"
 			helpText="Image format used for exported cover (.png fallback)"

@@ -3,6 +3,7 @@ import * as lamejs from '@breezystack/lamejs';
 import { MediaRecorder as Recorder, register } from 'extendable-media-recorder';
 
 import { connect } from 'extendable-media-recorder-wav-encoder';
+import { normalizeAudioChannels } from './audioNormalization';
 
 const audioStreams = new WeakMap<HTMLAudioElement, MediaStream>();
 
@@ -59,7 +60,7 @@ export async function startRecording(audioElement: HTMLAudioElement) {
 	mediaRecorder.start();
 }
 
-export function stopRecording(kbps: number, canceled = false) {
+export function stopRecording(kbps: number, canceled = false, normalizeAudio = false) {
 	return new Promise<ArrayBuffer | undefined>((resolve, reject) => {
 		if (!mediaRecorder) {
 			return resolve(undefined);
@@ -78,21 +79,34 @@ export function stopRecording(kbps: number, canceled = false) {
 				const audioBlob = new Blob(audioBlobs, { type: mimeType });
 				const blobBuffer = await audioBlob.arrayBuffer();
 				const audioBuffer = await audioContext.decodeAudioData(blobBuffer);
-				const leftChannelData = audioBuffer.getChannelData(0);
-				const rightChannelData = audioBuffer.getChannelData(1);
+				const numberOfChannels = Math.min(2, audioBuffer.numberOfChannels);
+				const channelData = Array.from({ length: numberOfChannels }, (_, index) =>
+					audioBuffer.getChannelData(index),
+				);
+				const leftChannelData = channelData[0];
+				const rightChannelData = channelData[1];
 				const leftChannel = new Int16Array(leftChannelData.length);
-				const rightChannel = new Int16Array(rightChannelData.length);
-				const mp3Encoder = new lamejs.Mp3Encoder(audioBuffer.numberOfChannels, audioBuffer.sampleRate, kbps);
+				const rightChannel = rightChannelData ? new Int16Array(rightChannelData.length) : undefined;
+				const mp3Encoder = new lamejs.Mp3Encoder(numberOfChannels, audioBuffer.sampleRate, kbps);
+
+				if (normalizeAudio) {
+					normalizeAudioChannels(channelData);
+				}
 
 				for (let index = 0, { length } = leftChannel; index < length; index += 1) {
 					leftChannel[index] = convertChannelData(leftChannelData[index]);
-					rightChannel[index] = convertChannelData(rightChannelData[index]);
+
+					if (rightChannel && rightChannelData) {
+						rightChannel[index] = convertChannelData(rightChannelData[index]);
+					}
 				}
 
 				for (let index = 0, { length } = leftChannel; index < length; index += sampleBlockSize) {
 					const leftChunk = leftChannel.subarray(index, index + sampleBlockSize);
-					const rightChunk = rightChannel.subarray(index, index + sampleBlockSize);
-					const encodedBuffer = mp3Encoder.encodeBuffer(leftChunk, rightChunk);
+					const rightChunk = rightChannel?.subarray(index, index + sampleBlockSize);
+					const encodedBuffer = rightChunk
+						? mp3Encoder.encodeBuffer(leftChunk, rightChunk)
+						: mp3Encoder.encodeBuffer(leftChunk);
 
 					if (encodedBuffer.length) {
 						mp3Data.push(encodedBuffer);
