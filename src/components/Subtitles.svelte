@@ -14,6 +14,11 @@
 		lastError$,
 		settings$,
 	} from '../lib/stores';
+	import {
+		getActionItems,
+		getSubtitleOverflowActionGroups,
+		primarySubtitleActionOrder,
+	} from '../lib/subtitleActions';
 	import { onMount, tick } from 'svelte';
 	import type { Readable } from 'svelte/store';
 	import { createVirtualizer, type SvelteVirtualizer } from '@tanstack/svelte-virtual';
@@ -120,29 +125,6 @@
 	const lineHeight = $subtitlesCopyLineHeight$
 		? Number.parseFloat(window.localStorage.getItem('lineHeight') || '1.65')
 		: $subtitlesLineHeight$;
-	const primarySubtitleActionOrder = [
-		Action.RESTART_PLAYBACK,
-		Action.TOGGLE_BOOKMARK,
-		Action.TOGGLE_MERGE,
-	];
-	const overflowSubtitleActionGroups = [
-		{
-			label: 'Playback',
-			actions: [Action.TOGGLE_PLAY_PAUSE, Action.TOGGLE_PLAYBACK_LOOP],
-		},
-		{
-			label: 'Text',
-			actions: [Action.RESTORE_SUBTITLE, Action.EDIT_SUBTITLE],
-		},
-		{
-			label: 'Export',
-			actions: [Action.EXPORT_NEW, Action.EXPORT_UPDATE],
-		},
-		{
-			label: 'Filters',
-			actions: [Action.TOGGLE_SHOW_BOOKMARKED, Action.TOGGLE_SHOW_FOR_MERGE],
-		},
-	];
 
 	let virtualizer: Readable<SvelteVirtualizer<HTMLDivElement, HTMLDivElement>>;
 	let virtualListElement: HTMLDivElement;
@@ -261,26 +243,8 @@
 		}
 	}
 
-	function getActionItems(actionList: ActionListItem[], actions: Action[]) {
-		return actions
-			.map((action) => actionList.find((item) => item.action === action))
-			.filter((item): item is ActionListItem => !!item?.enabled);
-	}
-
 	function getOverflowActionGroups(actionList: ActionListItem[]) {
-		const groupedActions = new Set([
-			...primarySubtitleActionOrder,
-			...overflowSubtitleActionGroups.flatMap(({ actions }) => actions),
-		]);
-		const actionGroups = overflowSubtitleActionGroups
-			.map(({ label, actions }) => ({
-				label,
-				items: getActionItems(actionList, actions),
-			}))
-			.filter(({ items }) => items.length);
-		const remainingItems = actionList.filter((item) => item.enabled && !groupedActions.has(item.action));
-
-		return remainingItems.length ? [...actionGroups, { label: 'More', items: remainingItems }] : actionGroups;
+		return getSubtitleOverflowActionGroups(actionList);
 	}
 </script>
 
