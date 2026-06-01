@@ -111,6 +111,8 @@
 	const { sandboxElement, isIOS } = getContext<Context>('context');
 	const allowedSubtitleExtensions: FileExtension[] = ['.srt', '.vtt', '.txt'];
 	const allowedAudioExtensions: FileExtension[] = ['.m4a', '.m4b', '.mp3'];
+	const subtitleFormatsText = formatFileExtensions(allowedSubtitleExtensions);
+	const audioFormatsText = formatFileExtensions(allowedAudioExtensions);
 
 	let subtitleInput: HTMLInputElement;
 	let audioFileInput: HTMLInputElement;
@@ -155,9 +157,9 @@
 		resetBookTitle = 'Export in progress';
 		changeAudioTitle = 'Export in progress';
 	} else {
-		changeSubtitleTitle = `${$currentSubtitleFile$ ? 'Change' : 'Set'} subtitle file`;
+		changeSubtitleTitle = `${$currentSubtitleFile$ ? 'Change' : 'Set'} subtitle file (${subtitleFormatsText})`;
 		resetBookTitle = $bookData$.htmlBackup ? 'Reset book & reload page' : 'No data to reset';
-		changeAudioTitle = `${$currentAudioFile$ ? 'Change' : 'Set'} audio file`;
+		changeAudioTitle = `${$currentAudioFile$ ? 'Change' : 'Set'} audio file (${audioFormatsText})`;
 	}
 
 	$: if (!Number.isFinite($extensionData$.playbackPosition) || $extensionData$.playbackPosition === 0) {
@@ -843,6 +845,10 @@
 		hasListItems = subtitles.length > 0;
 	}
 
+	function formatFileExtensions(extensions: FileExtension[]) {
+		return extensions.join(', ');
+	}
+
 	function onAudioLoad(..._args: any) {
 		$currentAudioLoaded$ = false;
 
@@ -913,7 +919,7 @@
 				<Icon path={mdiFloppy} />
 			</button>
 			<Popover placement="bottom" bind:this={subtitleFilePopover}>
-				<div slot="icon" title="Show subtitle file">
+				<div slot="icon" title={`Subtitle file (${subtitleFormatsText})`}>
 					<Icon path={mdiText} />
 				</div>
 				<div>{$currentSubtitleFile$?.name || 'None selected'}</div>
@@ -963,7 +969,7 @@
 				<Icon path={mdiDeleteSweep} />
 			</button>
 			<Popover placement="bottom" bind:this={audioFilePopover}>
-				<div slot="icon" title="Show audio file">
+				<div slot="icon" title={`Audio file (${audioFormatsText})`}>
 					<Icon path={mdiBookMusic} />
 				</div>
 				<div>{$currentAudioFile$?.name || 'None selected'}</div>
@@ -1176,7 +1182,29 @@
 					$skipKeyListener$ = false;
 				}}
 				on:result={onHandleFiles}
-			/>
+			>
+				<div class="dropzone-file-hint pointer-events-none">
+					<div>
+						<div class="dropzone-file-hint-title">
+							{$isMobile$ ? 'Tap here to choose files' : 'Drop files anywhere in this area'}
+						</div>
+						<div class="dropzone-file-hint-subtitle">
+							Use the file icons above if you want to choose subtitle and audio separately.
+						</div>
+					</div>
+					<div class="dropzone-file-types">
+						<div class="dropzone-file-type">
+							<div class="dropzone-file-type-label">Subtitle</div>
+							<div class="dropzone-file-type-formats">{subtitleFormatsText}</div>
+						</div>
+						<div class="dropzone-file-type">
+							<div class="dropzone-file-type-label">Audio</div>
+							<div class="dropzone-file-type-formats">{audioFormatsText}</div>
+						</div>
+					</div>
+					<div class="dropzone-file-note">One subtitle file and one audio file can be loaded at a time.</div>
+				</div>
+			</Dropzone>
 		{/if}
 		{#if showMenu && $currentTab$ === Tabs.AUDIOBOOK && $currentSubtitles$.size}
 			<div class="flex match-btns m-b-s" class:invisible={!$exportCancelController$}>

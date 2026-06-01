@@ -368,6 +368,10 @@
 	on:drop|preventDefault={onDrop}
 	on:click={onTriggerFileSelection}
 >
-	<div class="pointer-events-none whitespace-pre-wrap p-4">{label}</div>
+	{#if $$slots.default}
+		<slot />
+	{:else}
+		<div class="pointer-events-none whitespace-pre-wrap p-4">{label}</div>
+	{/if}
 </button>
 <input class="hidden" type="file" {multiple} {accept} bind:this={inputElement} on:change={onFileChange} />
