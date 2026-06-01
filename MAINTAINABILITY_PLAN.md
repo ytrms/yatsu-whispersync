@@ -41,3 +41,16 @@ asset names.
   helpers, and fixed the `development` mode script typo.
 - Verified with `pnpm run test`, `pnpm run check`, and `pnpm run build`.
 - Verified the corrected development build path with `pnpm run build:dev`.
+
+## Release Plan: v1.0.19
+
+- [x] Confirm the latest published GitHub release is `v1.0.18`.
+- [x] Bump the package/userscript version to `1.0.19`.
+- [x] Run `pnpm run test`, `pnpm run check`, and `pnpm run build`.
+- [x] Confirm generated Tampermonkey and Violentmonkey assets use `@version`
+      `1.0.19`.
+- [x] Commit the release version bump.
+- [x] Tag `v1.0.19`.
+- [ ] Push `main` and the `v1.0.19` tag.
+- [ ] Publish GitHub release `v1.0.19` with the two userscript assets.
+- [ ] Verify the published release metadata and asset names.
