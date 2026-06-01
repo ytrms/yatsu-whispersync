@@ -19,16 +19,19 @@ describe('default settings', () => {
 		expect(defaults['yatsu-whispersync-reader-enable-filesystem-api']).toBe(true);
 		expect(defaults['yatsu-whispersync-reader-enable-vn-mode']).toBe(false);
 		expect(defaults['yatsu-whispersync-reader-scroll-behavior']).toBe(ReaderScrollBehavior.INSTANT);
-		expect(defaults['yatsu-whispersync-reader-menu-open-mode']).toBe(ReaderMenuOpenMode.CLICK);
-		expect(defaults['yatsu-whispersync-subtitles-actions-visibility']).toBe(SubtitleActionsVisibility.HOVER);
-		expect(defaults['yatsu-whispersync-export-audio-processor']).toBe(AudioProcessor.RECORDER);
-		expect(defaults['yatsu-whispersync-anki-url']).toBe('http://localhost:8765');
-		expect(defaults['yatsu-whispersync-match-line-similarity-threshold']).toBe(0.9);
+			expect(defaults['yatsu-whispersync-reader-menu-open-mode']).toBe(ReaderMenuOpenMode.CLICK);
+			expect(defaults['yatsu-whispersync-reader-tracker-pause-threshold']).toBe(500);
+			expect(defaults['yatsu-whispersync-subtitles-actions-visibility']).toBe(SubtitleActionsVisibility.HOVER);
+			expect(defaults['yatsu-whispersync-export-audio-processor']).toBe(AudioProcessor.RECORDER);
+			expect(defaults['yatsu-whispersync-anki-url']).toBe('http://localhost:8765');
+			expect(defaults['yatsu-whispersync-match-line-similarity-threshold']).toBe(0.9);
 	});
 
 	it('returns individual defaults by storage key', () => {
-		expect(getDefaultSetting('yatsu-whispersync-player-rewind-time')).toBe(5);
-		expect(getDefaultSetting('yatsu-whispersync-reader-click-action')).toBe(Action.NONE);
+			expect(getDefaultSetting('yatsu-whispersync-player-rewind-time')).toBe(5);
+			expect(getDefaultSetting('yatsu-whispersync-player-playback-rate')).toBe(1);
+			expect(getDefaultSetting('yatsu-whispersync-menu-position')).toBe('left');
+			expect(getDefaultSetting('yatsu-whispersync-reader-click-action')).toBe(Action.NONE);
 		expect(getDefaultSetting('yatsu-whispersync-subtitles-font-family')).toBe('Noto Serif JP');
 	});
 

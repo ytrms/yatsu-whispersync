@@ -84,6 +84,8 @@ export interface ActionListItem {
 }
 
 export type Settings = {
+	'yatsu-whispersync-menu-position': string;
+	'yatsu-whispersync-hide-footer-actions': boolean;
 	'yatsu-whispersync-reader-line-highlight-color': string;
 	'yatsu-whispersync-reader-line-text-highlight-color': string;
 	'yatsu-whispersync-reader-enable-line-highlight': boolean;
@@ -101,6 +103,7 @@ export type Settings = {
 	'yatsu-whispersync-reader-menu-open-mode': ReaderMenuOpenMode;
 	'yatsu-whispersync-reader-menu-pause-mode': ReaderMenuPauseMode;
 	'yatsu-whispersync-reader-menu-open-time': number;
+	'yatsu-whispersync-reader-tracker-pause-threshold': number;
 	'yatsu-whispersync-subtitles-enable-persist': boolean;
 	'yatsu-whispersync-subtitles-enable-auto-scroll': boolean;
 	'yatsu-whispersync-subtitles-copy-font-family': boolean;
@@ -125,6 +128,7 @@ export type Settings = {
 	'yatsu-whispersync-player-alt-rewind-time': number;
 	'yatsu-whispersync-player-fast-forward-time': number;
 	'yatsu-whispersync-player-alt-fast-forward-time': number;
+	'yatsu-whispersync-player-playback-rate': number;
 	'yatsu-whispersync-player-playback-rate-decrease-time': number;
 	'yatsu-whispersync-player-playback-rate-increase-time': number;
 	'yatsu-whispersync-export-field-mode': ExportFieldMode;
@@ -247,6 +251,8 @@ export enum AnkiDuplicateMode {
 
 export function getDefaultSettings(): Settings {
 	return {
+		'yatsu-whispersync-menu-position': 'left',
+		'yatsu-whispersync-hide-footer-actions': false,
 		'yatsu-whispersync-reader-line-highlight-color': '#ccfbf1',
 		'yatsu-whispersync-reader-line-text-highlight-color': '#0f172a',
 		'yatsu-whispersync-reader-enable-line-highlight': true,
@@ -264,6 +270,7 @@ export function getDefaultSettings(): Settings {
 		'yatsu-whispersync-reader-menu-open-mode': ReaderMenuOpenMode.CLICK,
 		'yatsu-whispersync-reader-menu-pause-mode': ReaderMenuPauseMode.PAUSE,
 		'yatsu-whispersync-reader-menu-open-time': 500,
+		'yatsu-whispersync-reader-tracker-pause-threshold': 500,
 		'yatsu-whispersync-subtitles-enable-persist': false,
 		'yatsu-whispersync-subtitles-enable-auto-scroll': true,
 		'yatsu-whispersync-subtitles-copy-font-family': true,
@@ -288,6 +295,7 @@ export function getDefaultSettings(): Settings {
 		'yatsu-whispersync-player-alt-rewind-time': 10,
 		'yatsu-whispersync-player-fast-forward-time': 5,
 		'yatsu-whispersync-player-alt-fast-forward-time': 10,
+		'yatsu-whispersync-player-playback-rate': 1,
 		'yatsu-whispersync-player-playback-rate-decrease-time': 0.05,
 		'yatsu-whispersync-player-playback-rate-increase-time': 0.05,
 		'yatsu-whispersync-export-field-mode': ExportFieldMode.AFTER,

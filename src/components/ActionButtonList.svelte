@@ -7,6 +7,9 @@
 		altFastForwardTitle$,
 		altRewindTitle$,
 		bookmarkedSubtitles$,
+		canExportToAnki$,
+		currentAudioLoaded$,
+		currentSubtitles$,
 		duration$,
 		editSubtitleTitle$,
 		exportCancelController$,
@@ -14,7 +17,9 @@
 		exportNewTitle$,
 		exportUpdateTitle$,
 		fastForwardTitle$,
+		isAnkiconnectAndroid$,
 		isRecording$,
+		lastExportedCardId$,
 		nextSubtitleTitle$,
 		openLastExportedCardTitle$,
 		paused$,
@@ -72,7 +77,7 @@
 
 	export let buttonClasses = '';
 
-	const { subtitlesGlobalStartPadding$, subtitlesGlobalEndPadding$ } = settings$;
+	const { ankiSentenceField$, ankiSoundField$, subtitlesGlobalStartPadding$, subtitlesGlobalEndPadding$ } = settings$;
 
 	$: bookmarkPath = subtitle && $bookmarkedSubtitles$.has(subtitle.id) ? mdiStar : mdiStarOutline;
 
@@ -93,7 +98,8 @@
 		path: string,
 		referenceSubtitle: Subtitle | undefined,
 	) {
-		let initialTitle = referenceSubtitle ? '' : 'No matching subtitle';
+		let finalTitle = referenceSubtitle ? title : 'No matching subtitle';
+		let disabled = isActionDisabled(action, referenceSubtitle);
 
 		if (title === $restoreSubtitleTitle$ && referenceSubtitle) {
 			const subtitlesGlobalStartPadding = $subtitlesGlobalStartPadding$ / 1000;
@@ -103,28 +109,71 @@
 				? between(0, $duration$, referenceSubtitle.originalEndSeconds + subtitlesGlobalEndPadding)
 				: Math.max(0, referenceSubtitle.originalEndSeconds + subtitlesGlobalEndPadding);
 
-			initialTitle =
+			const hasDataToRestore =
 				referenceSubtitle.text !== referenceSubtitle.originalText ||
 				(Number.isFinite(referenceSubtitle.adjustedStartSeconds) &&
 					referenceSubtitle.adjustedStartSeconds !== startSeconds) ||
 				(Number.isFinite(referenceSubtitle.adjustedEndSeconds) &&
-					referenceSubtitle.adjustedEndSeconds !== endSeconds)
-					? title
-					: 'No data to restore';
-		}
+					referenceSubtitle.adjustedEndSeconds !== endSeconds);
 
-		const finalTitle = action === title ? initialTitle || title : title;
-		const isDisabled = finalTitle !== action;
+			if (!hasDataToRestore) {
+				finalTitle = 'No data to restore';
+				disabled = true;
+			}
+		}
 
 		return {
 			path,
 			action,
 			buttonClasses,
 			title: finalTitle,
+			disabled,
 			subtitle: referenceSubtitle,
-			buttonStyles: isFooter ? `margin-left: 0.5rem;${isDisabled ? 'opacity: 0.4;' : ''}` : '',
-			iconStyles: isFooter && isDisabled ? 'cursor: not-allowed;' : '',
+			buttonStyles: isFooter ? `margin-left: 0.5rem;${disabled ? 'opacity: 0.4;' : ''}` : '',
+			iconStyles: isFooter && disabled ? 'cursor: not-allowed;' : '',
 		};
+	}
+
+	function isActionDisabled(action: Action, referenceSubtitle: Subtitle | undefined) {
+		switch (action) {
+			case Action.TOGGLE_PLAYBACK:
+			case Action.REWIND_ALT:
+			case Action.REWIND:
+			case Action.FAST_FORWARD:
+			case Action.FAST_FORWARD_ALT:
+				return !$currentAudioLoaded$ || $isRecording$;
+			case Action.PREVIOUS_SUBTITLE:
+			case Action.NEXT_SUBTITLE:
+			case Action.RESTART_PLAYBACK:
+			case Action.TOGGLE_PLAY_PAUSE:
+			case Action.TOGGLE_PLAYBACK_LOOP:
+				return !referenceSubtitle || !$currentSubtitles$.size || !$currentAudioLoaded$ || $isRecording$;
+			case Action.TOGGLE_BOOKMARK:
+			case Action.TOGGLE_MERGE:
+			case Action.COPY_SUBTITLE:
+				return !referenceSubtitle || !$currentSubtitles$.size;
+			case Action.TOGGLE_SHOW_BOOKMARKED:
+			case Action.TOGGLE_SHOW_FOR_MERGE:
+				return !$currentSubtitles$.size;
+			case Action.EDIT_SUBTITLE:
+			case Action.RESTORE_SUBTITLE:
+				return !referenceSubtitle || !$currentSubtitles$.size || !!$exportCancelController$;
+			case Action.EXPORT_NEW:
+			case Action.EXPORT_UPDATE:
+				return (
+					!referenceSubtitle ||
+					!$canExportToAnki$ ||
+					!$currentSubtitles$.size ||
+					($ankiSoundField$ && !$currentAudioLoaded$ && !$ankiSentenceField$) ||
+					!!$exportCancelController$
+				);
+			case Action.OPEN_LAST_EXPORTED_CARD:
+				return $isAnkiconnectAndroid$ || !!$exportCancelController$ || !$lastExportedCardId$;
+			case Action.CANCEL_EXPORT:
+				return !$exportCancelController$ || $exportCancelController$.signal.aborted;
+			default:
+				return true;
+		}
 	}
 </script>
 

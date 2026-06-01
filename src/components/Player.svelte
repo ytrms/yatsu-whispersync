@@ -132,10 +132,11 @@
 		exportAudioBitrate$,
 		keybindingsEnableTimeFallback$,
 	} = settings$;
-	const { isIOS } = getContext<Context>('context');
-	const statisticsEnabled = !!+`${window.localStorage.getItem('statisticsEnabled') || '0'}`;
-	const yomiObserver = new MutationObserver(handleYomiMutation);
-	const dictionaryObserver = new MutationObserver(handleMutation);
+		const { isIOS } = getContext<Context>('context');
+		const statisticsEnabled = !!+`${window.localStorage.getItem('statisticsEnabled') || '0'}`;
+		const playbackPersistenceIntervalMs = 5000;
+		const yomiObserver = new MutationObserver(handleYomiMutation);
+		const dictionaryObserver = new MutationObserver(handleMutation);
 
 	let audioElement: HTMLAudioElement;
 	let yomiPopover: HTMLElement | null;
@@ -151,10 +152,12 @@
 	let actionTimeIndex = -1;
 	let suppressReaderCue = false;
 	let originalCurrentTime = -1;
-	let originalPlaybackRate = -1;
-	let skipNextCue = false;
-	let originalMuted: boolean | undefined;
-	let displayedPlaybackrate = $playbackRate$;
+		let originalPlaybackRate = -1;
+		let skipNextCue = false;
+		let originalMuted: boolean | undefined;
+		let lastPlaybackPositionPersistedAt = 0;
+		let lastPersistedPlaybackPosition = -1;
+		let displayedPlaybackrate = $playbackRate$;
 	let recorderSuccess: undefined | ((audioBuffer: ArrayBuffer | undefined) => void);
 	let recorderFailure: undefined | ((error: any) => void);
 
@@ -434,10 +437,10 @@
 		dispatch('loaded');
 	}
 
-	async function onCurrentTimeChange() {
-		if ($exportCancelController$?.signal.aborted) {
-			await stopRecording($exportAudioBitrate$, true).catch(() => {
-				// no-op
+		async function onCurrentTimeChange(event?: Event) {
+			if ($exportCancelController$?.signal.aborted) {
+				await stopRecording($exportAudioBitrate$, true).catch(() => {
+					// no-op
 			});
 
 			recorderFailure?.(new AbortError('user aborted'));
@@ -498,30 +501,53 @@
 			$isLoading$ = false;
 		}
 
-		if (originalCurrentTime > -1 || !storePlaybackPosition) {
-			return;
-		}
+			if (originalCurrentTime > -1 || !storePlaybackPosition) {
+				return;
+			}
 
-		$lastError$ = '';
-
-		try {
 			const playbackPosition = $currentTime$;
+			const forcePersist = event?.type === 'pause';
 
-			await $booksDB$.put('audioBook', {
-				playbackPosition,
-				title: $extensionData$.title,
+			if (!shouldPersistPlaybackPosition(playbackPosition, forcePersist)) {
+				return;
+			}
+
+			$lastError$ = '';
+
+			try {
+				await $booksDB$.put('audioBook', {
+					playbackPosition,
+					title: $extensionData$.title,
 				lastAudioBookModified: Date.now(),
 			});
 
-			$extensionData$.playbackPosition = playbackPosition;
+				$extensionData$.playbackPosition = playbackPosition;
+				lastPersistedPlaybackPosition = playbackPosition;
+				lastPlaybackPositionPersistedAt = Date.now();
 
-			document.dispatchEvent(new CustomEvent('ttu-action', { detail: { type: 'sync', syncType: 'audioBook' } }));
+				document.dispatchEvent(new CustomEvent('ttu-action', { detail: { type: 'sync', syncType: 'audioBook' } }));
 		} catch ({ message }: any) {
 			$lastError$ = `Failed to update current time: ${message}`;
 		}
 
-		$extensionData$ = $extensionData$;
-	}
+			$extensionData$ = $extensionData$;
+		}
+
+		function shouldPersistPlaybackPosition(playbackPosition: number, forcePersist: boolean) {
+			if (!Number.isFinite(playbackPosition)) {
+				return false;
+			}
+
+			if (forcePersist) {
+				return playbackPosition !== lastPersistedPlaybackPosition;
+			}
+
+			const now = Date.now();
+			const hasEnoughTimeElapsed = now - lastPlaybackPositionPersistedAt >= playbackPersistenceIntervalMs;
+			const hasMeaningfulPositionChange = Math.abs(playbackPosition - lastPersistedPlaybackPosition) >= 1;
+
+			return hasEnoughTimeElapsed && hasMeaningfulPositionChange;
+		}
 
 	function onProgressToolTip(event: PointerEventWithElement<Element>) {
 		progressToolTip = toTimeString(calculateTime(event));

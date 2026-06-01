@@ -3,7 +3,7 @@ import InteractiveEditSubtitleDialog from '../components/InteractiveEditSubtitle
 import ManualEditSubtitleDialog from '../components/ManualEditSubtitleDialog.svelte';
 import type { SubtitleData } from './db';
 import { getDummySubtitle, type EditSubtitleResult, type Subtitle } from './general';
-import { AudioProcessor } from './settings';
+import { Action, AudioProcessor } from './settings';
 import {
 	bookmarkedSubtitles$,
 	playLine$,
@@ -31,6 +31,8 @@ import {
 } from './stores';
 import { get, type Writable } from 'svelte/store';
 import { allIgnoredElements, between, getLineCSSSelectorForId, parseHTML, toTimeStamp } from './util';
+
+export { Action } from './settings';
 
 function dispatchSkipKeyEvent(document: Document, value: boolean) {
 	document.dispatchEvent(
@@ -243,32 +245,6 @@ function getSubtitlesForExport(subtitles: Subtitle[], mergeSubtitles: boolean | 
 	}
 
 	return JSON.parse(JSON.stringify(subtitlesForExport));
-}
-
-export enum Action {
-	NONE = 'None',
-	TOGGLE_PLAYBACK = 'Toggle playback',
-	REWIND = 'Rewind',
-	REWIND_ALT = 'Rewind #2',
-	FAST_FORWARD = 'Fast-Forward',
-	FAST_FORWARD_ALT = 'Fast-Forward #2',
-	RESTART_PLAYBACK = 'Restart playback',
-	TOGGLE_PLAY_PAUSE = 'Toggle play and pause',
-	TOGGLE_PLAYBACK_LOOP = 'Toggle playback loop',
-	TOGGLE_BOOKMARK = 'Toggle bookmark',
-	TOGGLE_SHOW_BOOKMARKED = 'Toggle menu bookmark filter',
-	TOGGLE_MERGE = 'Toggle for merge',
-	TOGGLE_SHOW_FOR_MERGE = 'Toggle menu merge filter',
-	ALIGN_SUBTITLE = 'Align with book text',
-	EDIT_SUBTITLE = 'Edit subtitle',
-	RESTORE_SUBTITLE = 'Restore original text and time',
-	COPY_SUBTITLE = 'Copy subtitle',
-	PREVIOUS_SUBTITLE = 'Go to previous subtitle',
-	NEXT_SUBTITLE = 'Go to next subtitle',
-	EXPORT_NEW = 'Create new card',
-	EXPORT_UPDATE = 'Update last created card',
-	OPEN_LAST_EXPORTED_CARD = 'Open last exported card',
-	CANCEL_EXPORT = 'Cancel Export',
 }
 
 export interface ActionSettings {

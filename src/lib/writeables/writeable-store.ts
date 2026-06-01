@@ -1,9 +1,9 @@
 import { getDefaultSetting, type Settings } from '../settings';
-import { migrateLocalStorageKey } from '../prefixes';
+import { getLegacyStorageKey, migrateLocalStorageKey } from '../prefixes';
 import { writable } from 'svelte/store';
 
 export function createWriteableStore<T>(mapFromString: (s: string) => T, mapToString: (t: T) => string) {
-	return (storageKey: string, forcedDefault?: T) => {
+	return (storageKey: keyof Settings, forcedDefault?: T) => {
 		const defaultValue = forcedDefault ?? (getDefaultSetting(storageKey as keyof Settings) as T);
 		const initValue = getStoredOrDefault()(storageKey, defaultValue, mapFromString);
 		const { subscribe, set } = writable(initValue);
@@ -48,6 +48,22 @@ function getStoredOrDefault() {
 	return <T>(key: string, defaultVal: T, mapFn: (s: string) => T) => {
 		const stored = migrateLocalStorageKey(window.localStorage, key);
 
-		return stored !== null ? mapFn(stored) : defaultVal;
+		if (stored === null) {
+			return defaultVal;
+		}
+
+		try {
+			return mapFn(stored);
+		} catch (_) {
+			window.localStorage.removeItem(key);
+
+			const legacyKey = getLegacyStorageKey(key);
+
+			if (legacyKey) {
+				window.localStorage.removeItem(legacyKey);
+			}
+
+			return defaultVal;
+		}
 	};
 }

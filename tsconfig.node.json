@@ -9,8 +9,10 @@
 	"include": [
 		"vite.ext.config.ts",
 		"vite.tm.script.config.ts",
+		"vite.userscript.config.ts",
 		"vite.vm.script.config.ts",
 		"vitest.config.ts",
+		"userscript.metadata.ts",
 		"src/manifest.config.ts",
 		"package.json"
 	]

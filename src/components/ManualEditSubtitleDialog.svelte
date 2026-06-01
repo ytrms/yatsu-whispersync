@@ -6,6 +6,8 @@
 	import type { Context, EditSubtitleResult, Subtitle } from '../lib/general';
 	import {
 		bookMatched$,
+		canExportToAnki$,
+		currentAudioLoaded$,
 		currentAudioSourceUrl$,
 		currentSubtitles$,
 		exportCancelController$,
@@ -14,6 +16,7 @@
 		exportUpdateTitle$,
 		isAnkiconnectAndroid$,
 		isRecording$,
+		lastExportedCardId$,
 		openLastExportedCardTitle$,
 		settings$,
 	} from '../lib/stores';
@@ -37,7 +40,7 @@
 	export let resolver: (arg0: EditSubtitleResult) => void;
 
 	const { isIOS } = getContext<Context>('context');
-	const { ankiEnableOpenInBrowser$ } = settings$;
+	const { ankiEnableOpenInBrowser$, ankiSentenceField$, ankiSoundField$ } = settings$;
 	const [originalStartHours, originalStartMinutes, originalStartSeconds, originalStartMiliseconds] = getTimeParts(
 		activeSubtitle.startSeconds,
 	);
@@ -75,6 +78,14 @@
 	$: currentEndSeconds = endHours * 3600 + endMinutes * 60 + endSeconds + endMiliseconds / 1000;
 
 	$: durationHours = $currentAudioSourceUrl$ ? Math.floor(duration / 3600) : 999;
+
+	$: exportActionDisabled =
+		!$canExportToAnki$ ||
+		!$currentSubtitles$.size ||
+		($ankiSoundField$ && !$currentAudioLoaded$ && !$ankiSentenceField$) ||
+		!!$exportCancelController$;
+
+	$: openLastExportedCardDisabled = $isAnkiconnectAndroid$ || !!$exportCancelController$ || !$lastExportedCardId$;
 
 	function onKeyDown(event: KeyboardEvent) {
 		if (isLoading || $isRecording$ || event.repeat || !(event.ctrlKey || event.metaKey || event.altKey)) {
@@ -384,39 +395,43 @@
 				ignoreSkipKeyListener
 				buttonClasses="m-l-s"
 				path={mdiDatabasePlus}
-				title={$exportNewTitle$}
-				action={Action.EXPORT_NEW}
-				subtitle={activeSubtitle}
-				clickHandler={onResetWasExportCanceled}
-				on:executed={onAfterExport}
+					title={$exportNewTitle$}
+					action={Action.EXPORT_NEW}
+					subtitle={activeSubtitle}
+					disabled={exportActionDisabled}
+					clickHandler={onResetWasExportCanceled}
+					on:executed={onAfterExport}
 			/>
 			<ActionButton
 				ignoreSkipKeyListener
 				buttonClasses="m-l-s"
 				path={mdiDatabaseSync}
-				title={$exportUpdateTitle$}
-				action={Action.EXPORT_UPDATE}
-				subtitle={activeSubtitle}
-				clickHandler={onResetWasExportCanceled}
-				on:executed={onAfterExport}
+					title={$exportUpdateTitle$}
+					action={Action.EXPORT_UPDATE}
+					subtitle={activeSubtitle}
+					disabled={exportActionDisabled}
+					clickHandler={onResetWasExportCanceled}
+					on:executed={onAfterExport}
 			/>
 			<ActionButton
 				ignoreSkipKeyListener
 				buttonClasses="m-l-s"
 				path={mdiOpenInApp}
-				title={$openLastExportedCardTitle$}
-				action={Action.OPEN_LAST_EXPORTED_CARD}
-				subtitle={activeSubtitle}
-			/>
+					title={$openLastExportedCardTitle$}
+					action={Action.OPEN_LAST_EXPORTED_CARD}
+					subtitle={activeSubtitle}
+					disabled={openLastExportedCardDisabled}
+				/>
 			{#if $exportCancelController$}
 				<ActionButton
 					ignoreSkipKeyListener
 					buttonClasses="match-btns m-l-s"
 					path={mdiCancel}
-					title={$exportCancelTitle$}
-					action={Action.CANCEL_EXPORT}
-					subtitle={activeSubtitle}
-					on:executed={() => (wasExportCanceled = true)}
+						title={$exportCancelTitle$}
+						action={Action.CANCEL_EXPORT}
+						subtitle={activeSubtitle}
+						disabled={!!$exportCancelController$?.signal.aborted}
+						on:executed={() => (wasExportCanceled = true)}
 				/>
 			{/if}
 		</div>

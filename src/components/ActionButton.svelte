@@ -9,6 +9,7 @@
 	export let action: string;
 	export let skipUpdates = false;
 	export let ignoreSkipKeyListener = false;
+	export let disabled = false;
 	export let buttonClasses = 'm-y-xs';
 	export let buttonStyles = '';
 	export let iconStyles = '';
@@ -21,10 +22,10 @@
 </script>
 
 <button
-	{title}
-	style={buttonStyles}
-	class={buttonClasses}
-	disabled={title !== action}
+		{title}
+		style={buttonStyles}
+		class={buttonClasses}
+		{disabled}
 	on:click={() => {
 		clickHandler?.();
 

@@ -33,12 +33,14 @@
 		exportProgress$,
 		extensionData$,
 		filesystemApiEnabled$,
-		hideFooterActions$,
-		isLoading$,
-		isMobile$,
-		isRecording$,
-		lastError$,
-		openLastExportedCardTitle$,
+			hideFooterActions$,
+			isAnkiconnectAndroid$,
+			isLoading$,
+			isMobile$,
+			isRecording$,
+			lastError$,
+			lastExportedCardId$,
+			openLastExportedCardTitle$,
 		paused$,
 		settings$,
 		showBookmarkedSubtitlesOnly$,
@@ -1092,11 +1094,12 @@
 			</button>
 			<ActionButton
 				title={$openLastExportedCardTitle$}
-				action={Action.OPEN_LAST_EXPORTED_CARD}
-				subtitle={getDummySubtitle(0)}
-				path={mdiOpenInApp}
-				buttonClasses=""
-			/>
+					action={Action.OPEN_LAST_EXPORTED_CARD}
+					subtitle={getDummySubtitle(0)}
+					path={mdiOpenInApp}
+					buttonClasses=""
+					disabled={$isAnkiconnectAndroid$ || !!$exportCancelController$ || !$lastExportedCardId$}
+				/>
 			</div>
 		</div>
 		<div

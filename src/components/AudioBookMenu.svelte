@@ -305,12 +305,14 @@
 
 	onMount(initializeComponent);
 
-	onDestroy(() => {
-		clearReaderMenuEvents();
+		onDestroy(() => {
+			clearReaderMenuEvents();
+			clearResizeMenuEvents();
 
-		document.removeEventListener('ttsu:skipKeyListener', onSkipKeyListener, false);
-		document.removeEventListener('ttsu:page.change', onPageChange, false);
-		clearTimeout(visualNovelPlaybackTimer);
+			document.removeEventListener('ttsu:skipKeyListener', onSkipKeyListener, false);
+			document.removeEventListener('ttsu:page.change', onPageChange, false);
+			clearTimeout(resizeTimer);
+			clearTimeout(visualNovelPlaybackTimer);
 
 		readerIntersectionObserver?.disconnect();
 
@@ -426,13 +428,17 @@
 			: `${originalMenuWidth - (event.pageX - originalMouseX)}px`;
 	}
 
-	function onStopResizeMenu() {
-		window.removeEventListener('pointermove', onResizeMenu, false);
-		window.removeEventListener('pointerup', onStopResizeMenu, false);
+		function onStopResizeMenu() {
+			clearResizeMenuEvents();
 
-		window.localStorage.setItem(sideMenuWidthKey, sideMenuWidth);
-		audiobookComponent?.resetSubtitleContainerHeight();
-	}
+			window.localStorage.setItem(sideMenuWidthKey, sideMenuWidth);
+			audiobookComponent?.resetSubtitleContainerHeight();
+		}
+
+		function clearResizeMenuEvents() {
+			window.removeEventListener('pointermove', onResizeMenu, false);
+			window.removeEventListener('pointerup', onStopResizeMenu, false);
+		}
 
 	function getStoredSideMenuWidth() {
 		return migrateLocalStorageKey(window.localStorage, sideMenuWidthKey) || '';
