@@ -67,6 +67,6 @@ asset names.
       `1.0.20`.
 - [x] Commit the change.
 - [x] Tag `v1.0.20`.
-- [ ] Push `main` and the `v1.0.20` tag.
-- [ ] Publish GitHub release `v1.0.20` with the two userscript assets.
-- [ ] Verify the published release metadata and asset names.
+- [x] Push `main` and the `v1.0.20` tag.
+- [x] Publish GitHub release `v1.0.20` with the two userscript assets.
+- [x] Verify the published release metadata and asset names.
