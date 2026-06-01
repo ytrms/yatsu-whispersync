@@ -51,6 +51,6 @@ asset names.
       `1.0.19`.
 - [x] Commit the release version bump.
 - [x] Tag `v1.0.19`.
-- [ ] Push `main` and the `v1.0.19` tag.
-- [ ] Publish GitHub release `v1.0.19` with the two userscript assets.
-- [ ] Verify the published release metadata and asset names.
+- [x] Push `main` and the `v1.0.19` tag.
+- [x] Publish GitHub release `v1.0.19` with the two userscript assets.
+- [x] Verify the published release metadata and asset names.
