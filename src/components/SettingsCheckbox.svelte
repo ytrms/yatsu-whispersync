@@ -7,12 +7,18 @@
 	export let targetStore$: SettingsStore<boolean>;
 	export let label: string;
 	export let helpText: string;
+	export let marker = '';
 
 	const id = targetStore$.key();
 </script>
 
 <label for={id}>{label}</label>
-<input type="checkbox" {id} bind:checked={$targetStore$} on:change />
+<div class="settings-checkbox-control">
+	<input type="checkbox" {id} bind:checked={$targetStore$} on:change />
+	{#if marker}
+		<span class="settings-marker">{marker}</span>
+	{/if}
+</div>
 <Popover mode="hover">
 	<div slot="icon">
 		<Icon path={mdiHelpCircle} />

@@ -871,6 +871,26 @@
 	accent-color: var(--yatsu-whispersync-panel-accent);
 }
 
+.yatsu-whispersync-container .settings-checkbox-control {
+	align-items: center;
+	display: flex;
+	gap: 0.45rem;
+	min-width: 0;
+}
+
+.yatsu-whispersync-container .settings-marker {
+	background: color-mix(in srgb, var(--yatsu-whispersync-panel-accent) 10%, var(--yatsu-whispersync-control-bg));
+	border: 1px solid color-mix(in srgb, var(--yatsu-whispersync-panel-accent) 34%, var(--yatsu-whispersync-control-border));
+	border-radius: 999px;
+	color: color-mix(in srgb, var(--yatsu-whispersync-panel-fg) 78%, transparent);
+	font-size: 0.58rem;
+	font-weight: 800;
+	line-height: 1;
+	padding: 0.16rem 0.34rem;
+	text-transform: uppercase;
+	white-space: nowrap;
+}
+
 .yatsu-whispersync-container input[type='color'] {
 	background: transparent;
 	border: 1px solid var(--yatsu-whispersync-control-border);

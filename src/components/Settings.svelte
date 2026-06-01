@@ -567,6 +567,7 @@
 		/>
 		<SettingsCheckbox
 			label="VN Mode"
+			marker="Beta"
 			helpText="If enabled, Yatsu Visual Novel page flips play the visible matched subtitle range and stop at the end of the current VN screen"
 			targetStore$={readerEnableVNMode$}
 		/>

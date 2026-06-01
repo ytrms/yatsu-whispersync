@@ -54,3 +54,19 @@ asset names.
 - [x] Push `main` and the `v1.0.19` tag.
 - [x] Publish GitHub release `v1.0.19` with the two userscript assets.
 - [x] Verify the published release metadata and asset names.
+
+## VN Mode Beta Marker Release Plan
+
+- [x] Confirm the working tree starts clean at `1.0.19`.
+- [x] Confirm the latest published GitHub release before releasing.
+- [x] Add an optional settings checkbox marker and apply a `Beta` marker to
+      `VN Mode`.
+- [x] Bump the package/userscript version to `1.0.20`.
+- [x] Run `pnpm run test`, `pnpm run check`, and `pnpm run build`.
+- [x] Confirm generated Tampermonkey and Violentmonkey assets use `@version`
+      `1.0.20`.
+- [x] Commit the change.
+- [x] Tag `v1.0.20`.
+- [ ] Push `main` and the `v1.0.20` tag.
+- [ ] Publish GitHub release `v1.0.20` with the two userscript assets.
+- [ ] Verify the published release metadata and asset names.
