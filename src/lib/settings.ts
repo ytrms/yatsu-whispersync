@@ -20,6 +20,8 @@ export enum Action {
 	COPY_SUBTITLE = 'Copy subtitle',
 	EXPORT_NEW = 'Create new card',
 	EXPORT_UPDATE = 'Update last created card',
+	EXPORT_MERGED_NEW = 'Export merged lines',
+	EXPORT_MERGED_UPDATE = 'Update last card with merged lines',
 	OPEN_LAST_EXPORTED_CARD = 'Open last exported card',
 	CANCEL_EXPORT = 'Cancel Export',
 }
@@ -75,8 +77,35 @@ export const defaultFooterActionList = new Map<Action, boolean>([
 	[Action.COPY_SUBTITLE, false],
 	[Action.EXPORT_NEW, false],
 	[Action.EXPORT_UPDATE, false],
+	[Action.EXPORT_MERGED_NEW, true],
+	[Action.EXPORT_MERGED_UPDATE, true],
 	[Action.OPEN_LAST_EXPORTED_CARD, false],
 ]);
+
+export function isMergeExportAction(action: string) {
+	return action === Action.EXPORT_MERGED_NEW || action === Action.EXPORT_MERGED_UPDATE;
+}
+
+export function isAnkiExportAction(action: string) {
+	return action === Action.EXPORT_NEW || action === Action.EXPORT_UPDATE || isMergeExportAction(action);
+}
+
+export function getEnabledFooterActions(actionList: ActionListItem[], hasMergeSelection: boolean) {
+	const enabled = actionList.filter(
+		({ action, enabled }) => enabled && (hasMergeSelection || !isMergeExportAction(action)),
+	);
+
+	if (hasMergeSelection) {
+		// A saved footer layout may predate the merged export actions.
+		for (const action of [Action.EXPORT_MERGED_NEW, Action.EXPORT_MERGED_UPDATE]) {
+			if (defaultFooterActionList.get(action) && !actionList.some((item) => item.action === action)) {
+				enabled.push({ action, enabled: true });
+			}
+		}
+	}
+
+	return enabled;
+}
 
 export interface ActionListItem {
 	action: Action;

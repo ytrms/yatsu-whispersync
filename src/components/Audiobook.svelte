@@ -1046,14 +1046,20 @@
 			<button
 				title={playPauseActionTitle}
 				disabled={!audioActionAvailable || (!$showBookmarkedSubtitlesOnly$ && !$showSubtitlesForMergeOnly$)}
-				on:click={() => executeAction(Action.TOGGLE_PLAY_PAUSE, subtitles, { skipUpdates: true })}
+				on:click={() => executeAction(Action.TOGGLE_PLAY_PAUSE, subtitles, {
+					skipUpdates: true,
+					mergeSubtitles: $showSubtitlesForMergeOnly$,
+				})}
 			>
 				<Icon path={mdiPlayPause} />
 			</button>
 			<button
 				title={loopSubtitleActionTitle}
 				disabled={!audioActionAvailable || (!$showBookmarkedSubtitlesOnly$ && !$showSubtitlesForMergeOnly$)}
-				on:click={() => executeAction(Action.TOGGLE_PLAYBACK_LOOP, subtitles, { skipUpdates: true })}
+				on:click={() => executeAction(Action.TOGGLE_PLAYBACK_LOOP, subtitles, {
+					skipUpdates: true,
+					mergeSubtitles: $showSubtitlesForMergeOnly$,
+				})}
 			>
 				<Icon path={mdiRefresh} />
 			</button>

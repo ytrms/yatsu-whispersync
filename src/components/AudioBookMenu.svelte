@@ -10,7 +10,13 @@
 	import { setAudioContext, setSubtitleContext, updateAudio, updateSubtitles, verifyPermissions } from '../lib/files';
 	import { type Context, Tabs, type Subtitle, getDummySubtitle } from '../lib/general';
 	import { getLegacyStorageKey, migrateLocalStorageKey } from '../lib/prefixes';
-	import { AudioProcessor, ReaderMenuOpenMode, ReaderMenuPauseMode } from '../lib/settings';
+	import {
+		AudioProcessor,
+		getEnabledFooterActions,
+		isAnkiExportAction,
+		ReaderMenuOpenMode,
+		ReaderMenuPauseMode,
+	} from '../lib/settings';
 	import {
 		activeSubtitle$,
 		altFastForwardTitle$,
@@ -55,6 +61,7 @@
 		rewindTitle$,
 		settings$,
 		skipKeyListener$,
+		subtitlesForMerge$,
 		toggleBookmarkTitle$,
 		toggleMergeTitle$,
 		togglePlaybackLoopTitle$,
@@ -178,11 +185,11 @@
 
 	$: $isRecording$ = $exportAudioProcessor$ === AudioProcessor.RECORDER && !!$exportCancelController$;
 
-	$: enabledFooterActions = $actionListOfFooter$.filter((action) => action.enabled);
+	$: enabledFooterActions = getEnabledFooterActions($actionListOfFooter$, $subtitlesForMerge$.size > 0);
 
 	$: showCancelFooterAction =
 		!!$exportCancelController$ &&
-		!!enabledFooterActions.find(({ action }) => action === Action.EXPORT_NEW || action === Action.EXPORT_UPDATE);
+		enabledFooterActions.some(({ action }) => isAnkiExportAction(action));
 
 	$: showFooterActions = enabledFooterActions.length && !$hideFooterActions$;
 
@@ -349,6 +356,20 @@
 				case 'KeyE':
 				case 'e':
 					action = Action.EXPORT_UPDATE;
+					break;
+				case 'KeyM':
+				case 'm':
+					if (
+						event.ctrlKey ||
+						event.metaKey ||
+						event.isComposing ||
+						!$subtitlesForMerge$.size ||
+						(event.target instanceof HTMLElement &&
+							(event.target.isContentEditable || event.target.closest('input, textarea, select')))
+					) {
+						return;
+					}
+					action = event.shiftKey ? Action.EXPORT_MERGED_UPDATE : Action.EXPORT_MERGED_NEW;
 					break;
 				case 'KeyG':
 				case 'g':
@@ -1009,7 +1030,7 @@
 	<ActionButtonList
 		isFooter
 		buttonClasses="h-full hover:opacity-70"
-		listItems={$actionListOfFooter$}
+		listItems={enabledFooterActions}
 		hideCancelAction={!showCancelFooterAction}
 		subtitle={$readerActionSubtitle$ ||
 			$currentSubtitles$.get($activeSubtitle$.current || $activeSubtitle$.previous)}

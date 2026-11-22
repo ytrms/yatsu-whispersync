@@ -1,9 +1,10 @@
 import { exportToAnki, openGUIForNote } from './anki';
+import { getMergedAudioRanges } from './audioRanges';
 import InteractiveEditSubtitleDialog from '../components/InteractiveEditSubtitleDialog.svelte';
 import ManualEditSubtitleDialog from '../components/ManualEditSubtitleDialog.svelte';
 import type { SubtitleData } from './db';
 import { getDummySubtitle, type EditSubtitleResult, type Subtitle } from './general';
-import { Action, AudioProcessor } from './settings';
+import { Action, AudioProcessor, isAnkiExportAction, isMergeExportAction } from './settings';
 import {
 	bookmarkedSubtitles$,
 	playLine$,
@@ -304,11 +305,18 @@ export async function executeAction(
 		ignoreSkipKeyListener: false,
 	},
 ) {
-	if (action === Action.NONE || !subtitle || (!settings.ignoreSkipKeyListener && get(skipKeyListener$))) {
+	if (action === Action.NONE || (!settings.ignoreSkipKeyListener && get(skipKeyListener$))) {
 		return;
 	}
 
-	const subtitles = Array.isArray(subtitle) ? subtitle : [subtitle];
+	const mergeSelection = isMergeExportAction(action) ? get(subtitlesForMerge$) : undefined;
+	const subtitles = mergeSelection
+		? [...get(currentSubtitles$).values()].filter(({ id }) => mergeSelection.has(id))
+		: Array.isArray(subtitle)
+			? subtitle
+			: subtitle
+				? [subtitle]
+				: [];
 	const exportCancelController = get(exportCancelController$);
 	const isRecording = get(isRecording$);
 
@@ -329,6 +337,7 @@ export async function executeAction(
 		playLine$.set({
 			action,
 			subtitles,
+			audioRanges: settings.mergeSubtitles ? getMergedAudioRanges(subtitles) : undefined,
 			skipUpdates: settings.skipUpdates,
 			keepPauseState: settings.keepPauseState,
 			suppressReaderCue: settings.suppressReaderCue,
@@ -368,20 +377,19 @@ export async function executeAction(
 			skipUpdates: settings.skipUpdates,
 			keepPauseState: true,
 		});
-	} else if (
-		!exportCancelController &&
-		(action === Action.EXPORT_NEW || action === Action.EXPORT_UPDATE) &&
-		get(canExportToAnki$)
-	) {
-		await exportToAnki(
-			getSubtitlesForExport(subtitles, settings.mergeSubtitles),
-			action === Action.EXPORT_UPDATE,
-			settings.mergeSubtitles || false,
-		).finally(() => {
-			exportProgress$.set(0);
-			exportCancelController$.set(undefined);
-		});
-	} else if (!exportCancelController) {
+	} else if (isAnkiExportAction(action)) {
+		if (!exportCancelController && get(canExportToAnki$)) {
+			const isMerge = !!(mergeSelection || settings.mergeSubtitles);
+			await exportToAnki(
+				getSubtitlesForExport(subtitles, isMerge),
+				action === Action.EXPORT_UPDATE || action === Action.EXPORT_MERGED_UPDATE,
+				isMerge,
+			).finally(() => {
+				exportProgress$.set(0);
+				exportCancelController$.set(undefined);
+			});
+		}
+	} else if (!exportCancelController && action === Action.OPEN_LAST_EXPORTED_CARD) {
 		await openGUIForNote(get(settings$.ankiUrl$));
 	} else if (exportCancelController && !exportCancelController.signal.aborted && action === Action.CANCEL_EXPORT) {
 		exportCancelController.abort('user aborted');

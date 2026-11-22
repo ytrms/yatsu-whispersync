@@ -23,6 +23,7 @@
 
 <button
 		{title}
+		aria-label={title}
 		style={buttonStyles}
 		class={buttonClasses}
 		{disabled}

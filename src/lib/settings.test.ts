@@ -7,6 +7,7 @@ import {
 	SubtitleActionsVisibility,
 	getDefaultSetting,
 	getDefaultSettings,
+	getEnabledFooterActions,
 } from './settings';
 
 describe('default settings', () => {
@@ -49,7 +50,7 @@ describe('default settings', () => {
 		);
 	});
 
-	it('keeps footer controls opt-in except playback', () => {
+	it('shows playback by default before any subtitles are marked', () => {
 		const defaults = getDefaultSettings();
 		const footerActions = defaults['yatsu-whispersync-action-list-of-footer'];
 
@@ -57,6 +58,26 @@ describe('default settings', () => {
 		expect(footerActions.find(({ action }) => action === Action.REWIND)?.enabled).toBe(false);
 		expect(footerActions.find(({ action }) => action === Action.COPY_SUBTITLE)?.enabled).toBe(false);
 		expect(footerActions.find(({ action }) => action === Action.EXPORT_NEW)?.enabled).toBe(false);
+		expect(getEnabledFooterActions(footerActions, false)).toEqual([
+			{ action: Action.TOGGLE_PLAYBACK, enabled: true },
+		]);
+		expect(getEnabledFooterActions(footerActions, true).map(({ action }) => action)).toEqual([
+			Action.TOGGLE_PLAYBACK,
+			Action.EXPORT_MERGED_NEW,
+			Action.EXPORT_MERGED_UPDATE,
+		]);
+	});
+
+	it('adds merged export to older footer layouts and respects explicit preferences', () => {
+		const savedLayout = [
+			{ action: Action.EXPORT_NEW, enabled: true },
+			{ action: Action.EXPORT_MERGED_UPDATE, enabled: false },
+		];
+
+		expect(getEnabledFooterActions(savedLayout, true)).toEqual([
+			{ action: Action.EXPORT_NEW, enabled: true },
+			{ action: Action.EXPORT_MERGED_NEW, enabled: true },
+		]);
 	});
 
 	it('creates fresh action list arrays for callers that need to mutate a copy', () => {

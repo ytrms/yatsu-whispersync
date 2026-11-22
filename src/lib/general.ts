@@ -29,15 +29,18 @@ export interface Context {
 	isIOS: boolean;
 }
 
-export interface Subtitle {
+export interface AudioRange {
+	startSeconds: number;
+	endSeconds: number;
+}
+
+export interface Subtitle extends AudioRange {
 	id: string;
 	originalStartSeconds: number;
 	adjustedStartSeconds?: number;
-	startSeconds: number;
 	startTime: string;
 	originalEndSeconds: number;
 	adjustedEndSeconds?: number;
-	endSeconds: number;
 	endTime: string;
 	originalText: string;
 	text: string;
@@ -77,6 +80,7 @@ export interface AudioResult {
 export interface PlayLineData {
 	action: string;
 	subtitles: Subtitle[];
+	audioRanges?: AudioRange[];
 	skipUpdates?: boolean;
 	keepPauseState?: boolean;
 	suppressReaderCue?: boolean;

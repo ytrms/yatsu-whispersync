@@ -1,6 +1,7 @@
 import { AnkiDuplicateMode, AudioProcessor, ExportFieldMode, ImageFormat } from './settings';
 import { caluclatePercentage, throwIfAborted } from './util';
 import { cleanFiles, getAudio } from './ffmpeg';
+import { getMergedAudioRanges } from './audioRanges';
 import {
 	currentAudioFile$,
 	currentCoverUrl$,
@@ -538,10 +539,12 @@ export async function exportToAnki(subtitlesToExport: Subtitle[][], isUpdate: bo
 
 		try {
 			if (ankiSoundField && currentAudioFile) {
+				const audioRanges = isMerge ? getMergedAudioRanges(subtitles) : subtitles;
+
 				if (isFFMPEG) {
 					audioBuffer = await getAudio(
 						currentAudioFile,
-						subtitles,
+						audioRanges,
 						false,
 						abortController.signal,
 						exportAudioFormat,
@@ -553,6 +556,7 @@ export async function exportToAnki(subtitlesToExport: Subtitle[][], isUpdate: bo
 					audioBuffer = await new Promise<ArrayBuffer | undefined>((recorderSuccess, recorderFailure) =>
 						playLine$.set({
 							subtitles,
+								audioRanges,
 							action: Action.TOGGLE_PLAY_PAUSE,
 							recorderSuccess,
 							recorderFailure,
@@ -714,7 +718,7 @@ export async function exportToAnki(subtitlesToExport: Subtitle[][], isUpdate: bo
 
 	if (failures) {
 		lastError$.set(`${failures} Export(s) failed`);
-	} else if (isMerge && get(settings$.exportEnableMergeSelectionAutoClear$)) {
+	} else if (isMerge && lastExportedCardId && get(settings$.exportEnableMergeSelectionAutoClear$)) {
 		subtitlesForMerge$.set(new Set<string>());
 	}
 }

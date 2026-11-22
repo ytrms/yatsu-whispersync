@@ -2,7 +2,7 @@
 	import ActionButton from './ActionButton.svelte';
 	import { Action } from '../lib/actions';
 	import { getDummySubtitle, type Subtitle } from '../lib/general';
-	import type { ActionListItem } from '../lib/settings';
+	import { isAnkiExportAction, isMergeExportAction, type ActionListItem } from '../lib/settings';
 	import {
 		altFastForwardTitle$,
 		altRewindTitle$,
@@ -56,7 +56,9 @@
 		mdiPauseCircleOutline,
 		mdiPlayCircleOutline,
 		mdiPlayPause,
+		mdiPlaylistEdit,
 		mdiPlaylistPlay,
+		mdiPlaylistPlus,
 		mdiRefresh,
 		mdiRestore,
 		mdiSelect,
@@ -90,7 +92,7 @@
 	$: showCancelAction =
 		!hideCancelAction &&
 		!!$exportCancelController$ &&
-		!!listItems.find(({ action }) => action === Action.EXPORT_NEW || action === Action.EXPORT_UPDATE);
+		listItems.some(({ action, enabled }) => enabled && isAnkiExportAction(action));
 
 	function getActionButtonProps(
 		action: Action,
@@ -98,7 +100,7 @@
 		path: string,
 		referenceSubtitle: Subtitle | undefined,
 	) {
-		let finalTitle = referenceSubtitle ? title : 'No matching subtitle';
+		let finalTitle = referenceSubtitle || isMergeExportAction(action) ? title : 'No matching subtitle';
 		let disabled = isActionDisabled(action, referenceSubtitle);
 
 		if (title === $restoreSubtitleTitle$ && referenceSubtitle) {
@@ -160,8 +162,10 @@
 				return !referenceSubtitle || !$currentSubtitles$.size || !!$exportCancelController$;
 			case Action.EXPORT_NEW:
 			case Action.EXPORT_UPDATE:
+			case Action.EXPORT_MERGED_NEW:
+			case Action.EXPORT_MERGED_UPDATE:
 				return (
-					!referenceSubtitle ||
+					(isMergeExportAction(action) ? !$subtitlesForMerge$.size : !referenceSubtitle) ||
 					!$canExportToAnki$ ||
 					!$currentSubtitles$.size ||
 					($ankiSoundField$ && !$currentAudioLoaded$ && !$ankiSentenceField$) ||
@@ -300,6 +304,26 @@
 		{:else if listItem.action === Action.EXPORT_UPDATE}
 			<ActionButton
 				{...getActionButtonProps(Action.EXPORT_UPDATE, $exportUpdateTitle$, mdiDatabaseSync, subtitle)}
+				on:executed
+			/>
+		{:else if listItem.action === Action.EXPORT_MERGED_NEW}
+			<ActionButton
+				{...getActionButtonProps(
+					Action.EXPORT_MERGED_NEW,
+					$exportNewTitle$ === Action.EXPORT_NEW ? Action.EXPORT_MERGED_NEW : $exportNewTitle$,
+					mdiPlaylistPlus,
+					undefined,
+				)}
+				on:executed
+			/>
+		{:else if listItem.action === Action.EXPORT_MERGED_UPDATE}
+			<ActionButton
+				{...getActionButtonProps(
+					Action.EXPORT_MERGED_UPDATE,
+					$exportUpdateTitle$ === Action.EXPORT_UPDATE ? Action.EXPORT_MERGED_UPDATE : $exportUpdateTitle$,
+					mdiPlaylistEdit,
+					undefined,
+				)}
 				on:executed
 			/>
 		{:else if listItem.action === Action.OPEN_LAST_EXPORTED_CARD}

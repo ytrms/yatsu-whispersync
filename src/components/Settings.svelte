@@ -1018,6 +1018,8 @@
 			<SettingsKeybind key="Cmd + m" description={Action.TOGGLE_MERGE} />
 			<SettingsKeybind key="Cmd + e" description={Action.EXPORT_NEW} />
 			<SettingsKeybind key="Alt + e" description={Action.EXPORT_UPDATE} />
+			<SettingsKeybind key="Alt + m" description={Action.EXPORT_MERGED_NEW} extendDescription={false} />
+			<SettingsKeybind key="Alt + Shift + m" description={Action.EXPORT_MERGED_UPDATE} extendDescription={false} />
 			<SettingsKeybind key="Alt + g" description={Action.EDIT_SUBTITLE} extendDescription={false} />
 			<SettingsKeybind key="Alt + z" description={Action.COPY_SUBTITLE} extendDescription={false} />
 			<SettingsKeybind key="Cmd + q" description={Action.PREVIOUS_SUBTITLE} extendDescription={false} />
